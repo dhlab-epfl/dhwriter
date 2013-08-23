@@ -1,0 +1,104 @@
+/*** SCSS Rules ***********************************************************************************************************************************************/
+
+// Positionning __________________________________________________________
+@mixin ABSOLUTE_CENTERED_X($width) {
+	position:absolute;
+	width:$width;
+	left:50%;
+	margin-left:-$width/2;
+}
+@mixin ABSOLUTE_CENTERED_Y($height) {
+	position:absolute;
+	height:$height;
+	top:50%;
+	margin-top:-$height/2;
+}
+@mixin FIXED_FULL {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+// Special Effects ______________________________________________________
+@mixin BORDER_RADIUS($radius) {
+	-webkit-border-radius:$radius;
+	-moz-border-radius:$radius;
+	border-radius: $radius;
+}
+@mixin ALPHA($percentage) {
+	opacity:($percentage/100);
+	filter:Alpha(opacity=$percentage);
+}
+@mixin TEXT_CLIP() {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+@mixin SHADOW($offset, $size) {
+	box-shadow:$offset $offset $size rgba(0,0,0,0.25);
+}
+// UI / Interaction _____________________________________________________
+@mixin NO_SELECT() {
+	-webkit-user-select:none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+/*
+@mixin SMOOTH($time) {
+	@include transition(all $time ease);
+}
+*/
+@mixin SCROLL_Y {
+	overflow:hidden;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+// Shapes _______________________________________________________________
+@mixin DISK($size) {
+	width:$size;
+	height:$size;
+	text-align:center;
+	@include BORDER_RADIUS($size);
+}
+@mixin fullTriangle($size, $dir:top, $bgColor:#000) {
+	position:absolute; display:block; content:""; width:0; height:0;
+	@if ($dir==top or $dir==bottom) {
+		border-left: $size solid transparent; border-right: $size solid transparent;
+		@if ($dir==top) {
+			border-bottom: $size solid $bgColor;
+			top: -$size;
+		}
+		@else {
+			border-top: $size solid $bgColor;
+			bottom: -$size;
+		}
+	}
+	@else {
+		border-top: $size solid transparent; border-bottom: $size solid transparent;
+		@if ($dir==left) {
+			border-right: $size solid $bgColor;
+			left: -$size;
+		}
+		@else {
+			border-left: $size solid $bgColor;
+			right: -$size;
+		}
+	}
+}
+@mixin lineTriangle($size, $dir:top, $bgColor:#fff, $lineColor:#000) {
+	@include fullTriangle($size - 1, $dir, $lineColor);
+	#{$dir}: -($size - 1);													// http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#interpolation_
+	&:before {
+		@include fullTriangle($size - 1, $dir, $bgColor);
+		#{$dir}:1px;
+		@if ($dir==top or $dir==bottom) {
+			left:-($size - 1);
+		}
+		@else {
+			top:-($size - 1);
+		}
+	}
+}
+

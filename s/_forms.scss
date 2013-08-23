@@ -1,0 +1,133 @@
+/***	Forms **********************************************************************/
+
+form { margin:0; }
+form label { display:block; width:80px; float:left; text-align:right; font-size:0.9em; margin-left:5px; margin:4px 5px 0 0; white-space:nowrap; height:1em; color:#333; @include user-select(none); }
+
+// ____________________________________________________________________________________________________________
+
+
+.filterform {
+	display:block; padding:3px; text-align:right; @include linear-gradient(#f0f0f0, #e2e2e2);
+	img { cursor:pointer; }
+	input {
+		width:120px; border-radius:20px; border:1px solid #ccc; border-bottom-color:#bbb; border-right-color:#c2c2c2; margin-right:20px; padding:2px 5px; outline:none;
+		position:relative;
+		&:focus {
+			box-shadow:0 0 3px rgba(81, 203, 238, 1);
+		}
+		&:after {
+			content:"🔍"; position:absolute; right:5px; top:3px; line-height:10px; font-size:10px; color:#999;
+		}
+	}
+}
+.filterable {
+}
+
+.checkaccordion {
+	h3 { font-weight:bold; }
+	ul { margin-left:40px; }
+}
+
+// ____________________________________________________________________________________________________________
+
+table.data {
+	font-size:11px; width:100%;
+	border:$kBorder;
+	td { padding:0 3px; }
+	tr {
+		border-top:1px solid #f7f9fc; border-bottom:1px solid #e8eaed; padding:1px 3px;
+	}
+	&.static {
+		tr {
+			&:nth-child(even) {
+				>td { background:#f1f4f7; border-top:1px solid #f7f9fc; border-bottom:1px solid #e8eaed; }
+			}
+		}
+	}
+	&.edit {
+		tr {
+			&.row { &.editing { display:none; padding:0; } }
+			&.form {			// Form-holding rows
+				display:none;
+				&.editing { display:table-row; table-padding:10px; }
+				.close { cursor:pointer; padding:2px; margin-top:1px; &:hover { box-shadow:1px 1px 3px rgba(0,0,0,0.3); } }
+				>td { border-left:1px solid #ddd; padding:0; border-bottom:1px solid #fff; box-shadow:1px 1px 5px rgba(0,0,0,0.3); }
+				header {
+					clear:both; text-align:right; background-color:#ddd; padding:2px;
+					h2 {
+						float:left; color:#fff; text-shadow:1px 1px 0 #999; margin:1px; padding:0;
+						img { margin:2px 7px -2px -5px; @include ALPHA(40); }
+					}
+				}
+				fieldset {
+					margin:12px;
+					&.half {
+						width:45%; float:left;
+						label { width:25%; }
+						input { width:70%; }
+					}
+				}
+			}
+			&:nth-child(4n+1) { >td { background:#f1f4f7; border-top:1px solid #f7f9fc; border-bottom:1px solid #e8eaed; } }		// Plain even rows
+		}
+	}
+	&.collapsable {
+		.details { margin:12px; display:none; }
+		tr {
+			&:nth-child(4n+1) { >td { background:#f1f4f7; border-top:1px solid #f7f9fc; border-bottom:1px solid #e8eaed; } }		// Plain even rows
+			&:nth-child(4n+2) { >td { background:#f1f4f7; } }
+		}
+	}
+}
+
+// ____________________________________________________________________________________________________________
+
+td.number { text-align: right; }
+th { text-align:left; background-color:#EEEEEE; border-bottom:$kBorder; margin-left:5px; font-size:11px; height:15px; }
+
+.fileInput {
+	div.file { width:350px; height:23px; overflow:hidden; background:#ccc; border:2px solid #FFFFFF; }
+	p { width:260px; height:17px; overflow:hidden; float:left; background:#FFFFFF; margin:2px; padding-left:3px; border-left:1px solid #999999; border-top:1px solid #999999; }
+	div.new { float:left; width:350px; margin:1px; border:1px dashed #999999; }
+}
+
+.hidden { display:none; }
+
+div.fu {
+	float:left; width:440px; height:25px; border:1px solid #ccc; background:#F6F6F6; font-family:Helvetica, Arial, sans-serif; font-size:11px;
+	.field { width:300px; height:17px; overflow:hidden; float:left; background:#fff; margin:2px; padding-left:3px; border-left:1px solid #999999; border-top:1px solid #999999; }
+
+	.fu_fileInfo { width:200px; text-overflow:hidden; float:left; margin:6px; }
+	.fu_progress { float:left; width:220px; display:none; }
+	.fu_progress img { border:0; float:left; margin:2px; }
+	.progressValue { width:100%; text-align:center; color:#666; margin-left:20px; }
+	.progressBar { width:200px; background:#ccc; height:10px; margin-left:20px; }
+	.progressLevel { background:red; height:100%; }
+}
+
+fieldset {
+	border:1px solid #999;
+	border-radius:5px;
+}
+legend {
+	font-size:9px;
+	padding:0 3px 0 1px;
+}
+
+li fieldset {
+	float:left;
+	width:90px;
+}
+
+img.btn {
+	margin-left:5px; padding:4px; width:16px; height:16px; cursor:pointer; border-radius:4px;
+	@include ALPHA(70);
+	box-shadow:1px 1px 3px rgba(0,0,0,0.3);
+	&:hover {
+		@include ALPHA(100);
+		box-shadow:1px 1px 4px rgba(0,0,0,0.4);
+	}
+}
+
+div.action_board { text-align:center; border:$kBorder; background-color:#ffc; margin:5px; padding:2px; clear:both; }
+

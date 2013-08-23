@@ -1,0 +1,9 @@
+[submodule "Aloha-Editor"]
+	path = Aloha-Editor
+	url = git://github.com/oerpub/Aloha-Editor
+[submodule "MathJax"]
+	path = MathJax
+	url = git://github.com/mathjax/MathJax/
+[submodule "_db"]
+	path = _db
+	url = git://github.com/cyrilbornet/_db

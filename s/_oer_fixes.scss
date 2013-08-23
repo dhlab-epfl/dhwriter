@@ -1,0 +1,10 @@
+.semantic-container {
+    border: 1px solid transparent;
+    &.focused {
+    	border-color:#ccc;
+    }
+}
+
+.semantic-drag-source > * {
+    height: 13px;
+}

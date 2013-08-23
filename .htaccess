@@ -1,0 +1,7 @@
+# Displaying PHP errors
+php_flag magic_quotes_gpc off
+php_flag display_errors on
+php_value error_reporting 6143
+
+RewriteEngine on
+RewriteRule ^export/([0-9]+)\.([a-zA-Z]+)$ /exporter.php?ext=$2&id=$1   [L]

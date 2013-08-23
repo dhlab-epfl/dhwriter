@@ -1,0 +1,19 @@
+
+#editor>#canvas {
+	counter-reset:citation;
+	line-height:1.4em; color:#444;
+	.document_title  {
+		color:#000; font:{size:28px;weight:normal}; border-bottom:1px solid $kColor_dh1;
+	}
+	h1, h2, h3, h4, h5, h6 {
+		color:$kColor_dh1; font-weight:bold; border:0; letter-spacing:0;
+	}
+	h1 {
+		font-size:20px;
+	}
+	q {
+		color:#000;
+		&:first-letter { color:$kColor_dh1; }
+		>sup>a { color:$kColor_dh1; &:after { content:"[" counter(citation) "]"; counter-increment:citation; } }
+	}
+}

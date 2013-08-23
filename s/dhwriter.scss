@@ -1,0 +1,160 @@
+// External libraries ______________________
+@import "bourbon/bourbon";
+@import "_reset";
+@import "_mixins";
+@import "_dh";
+
+@import "_forms";
+
+
+// __________________________________________
+
+body {
+	font:{family:'Helvetica Neue', Helvetica, sans-serif; size:13px;} margin:0 auto; width:960px; height:100%;
+	background:#fff; @include linear-gradient(#c8c8c8, #fff 80px);
+	>header {
+		display:block; width:100%; margin:70px 0 25px 0; padding-top:25px; height:100px; border-top:$kBorder; border-bottom:$kBorder;
+		#logo { display:block; margin:auto; }
+		nav {
+			float:right; margin-top:30px; text-transform:uppercase;
+			a {
+				font:{family:Oswald, Helvetica, sans-serif; size:18px;}; margin:0 10px; color:#666;
+				&:hover { color:#444; }
+				&.current { color:#111; }
+			}
+		}
+	}
+	>section {
+		@include clearfix;
+		.loginPanel {
+			form { display:block; margin-bottom:30px; }
+			label { width:80px; }
+			input { width:140px; }
+			p { text-align:center; }
+			a.button { @include button($kColor_dh2); }
+		}
+		article {
+			width:660px; margin-top:40px;
+			h1 { font:{family:Oswald, Helvetica, sans-serif; size:25px;}; color:#666; margin:5px 0 15px 0; text-transform:uppercase; }
+			p { line-height:22px; color:#555; }
+		}
+		#loginModal {
+
+		}
+	}
+	>footer {
+		text-align:center; font-size:11px; @include clearfix; margin-top:50px; border-top:$kBorder; line-height:60px;
+		a { font-weight:bold; color:$kColor_dh2; text-decoration:none; margin:3px; }
+	}
+}
+
+#index {
+	aside.loginPanel {
+		float:right; width:240px; border-left:$kBorder; padding:40px 0;
+	}
+}
+
+#loginModal {
+	display:block; margin:50px 240px; padding:30px; border:$kBorder; border-radius:20px;
+	form { border-bottom:$kBorder; padding-bottom:30px; }
+	label { width:135px; }
+}
+
+
+// __________________________________________
+
+#writer {
+	width:100%; background:#ccc;
+	// Aloha / OER editor
+	@import "_aloha";
+	@import "_bootstrap";
+	@import "_toolbar";
+
+	@import "_oer_fixes";
+	@import "_dh_texts";
+
+	#logo_small {
+		width:126px; height:24px;
+	}
+
+	#container {
+		width:100%;
+	}
+
+	#artboard {
+	    margin-top: 40px;
+	    background-color: #CCC;
+	}
+
+	#canvas {
+	    margin-top: 0;
+	}
+
+	#content {
+	    padding: 1em 1em;
+	    background-color: #CCC;
+	}
+
+	#statusmessage {
+	    height: 0;
+	}
+
+	#statusmessage div {
+	    text-align: center;
+	    margin-bottom: 0.25em;
+
+	    border: 1px solid #f0f000;
+	    background-color: #ffffe0;
+
+	    font-weight: bold;
+	    padding: .75em 1em;
+	    margin: auto;
+	    display: inline;
+	    -moz-box-shadow:    3px 3px 2px 2px #ddd;
+	    -webkit-box-shadow: 3px 3px 2px 2px #ddd;
+	    box-shadow:         3px 3px 2px 2px #ddd;
+	    z-index: 1010;
+	    position: relative;
+	}
+
+	#statusmessage div.error {
+	    background-color: red;
+	}
+
+	#statusmessage .persistent-error i {
+	    display: block;
+	    position: absolute;
+	    top: 0;
+	    right: 0;
+	    cursor: pointer;
+	    margin-left: -9999px;
+	    background-image: url("../images/remove-01.png");
+	    height: 16px;
+	    width: 16px;
+	}
+
+	.aloha-block.title,
+	.aloha-block.title:focus,
+	.aloha-block.title:hover {
+	    outline: none !important;
+	    padding: 0;
+	}
+
+	.aloha-block {
+	    box-shadow: none !important;
+	}
+
+	#sidebar {
+		width:180px;
+		>div {
+			border-top:1px solid #999;
+			margin-top:40px;
+			&:first-child { border:none; }
+		}
+		#draggableParts {
+			margin-top: 20px; width: 100%;
+		}
+		#citations {
+		}
+	}
+}
