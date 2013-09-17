@@ -1,4 +1,12 @@
-// External libraries ______________________
+// Inherited global styles ____________________________
+@import "../Aloha-Editor/src/css/aloha.css";
+@import "bootstrap-combined.min.css";
+@import "../Aloha-Editor/oerpub/css/html5_metacontent.css";
+@import "../Aloha-Editor/oerpub/css/html5_content_in_oerpub.css";
+@import "jquery-ui.css";
+
+
+// External libraries _________________________________
 @import "bourbon/bourbon";
 @import "_reset";
 @import "_mixins";
@@ -6,11 +14,26 @@
 
 @import "_forms";
 
+// _____________________________________________________________________________________________________________________________________________________________
 
-// __________________________________________
+$kZ_wait : 10000;
+$kPage_W: 760px;
+
+$kPage_posX : 173px;
+
+$kPage_marginL : 30px;
+$kPage_marginR : $kPage_marginL;
+$kPage_marginT : 25px;
+$kPage_marginB : 150px;
+
+$kSidebar_W : 140px;
+
+$kTitleSpacing : 10px;
+
+// _____________________________________________________________________________________________________________________________________________________________
 
 body {
-	font:{family:'Helvetica Neue', Helvetica, sans-serif; size:13px;} margin:0 auto; width:960px; height:100%;
+	width:960px; height:100%;
 	background:#fff; @include linear-gradient(#c8c8c8, #fff 80px);
 	>header {
 		display:block; width:100%; margin:70px 0 25px 0; padding-top:25px; height:100px; border-top:$kBorder; border-bottom:$kBorder;
@@ -56,12 +79,16 @@ body {
 
 #loginModal {
 	display:block; margin:50px 240px; padding:30px; border:$kBorder; border-radius:20px;
-	form { border-bottom:$kBorder; padding-bottom:30px; }
+	#fLogin { border-bottom:$kBorder; padding-bottom:30px; }
 	label { width:135px; }
 }
 
 
 // __________________________________________
+
+#editor {
+	@import "_dh_texts";
+}
 
 #writer {
 	width:100%; background:#ccc;
@@ -71,90 +98,182 @@ body {
 	@import "_toolbar";
 
 	@import "_oer_fixes";
-	@import "_dh_texts";
 
 	#logo_small {
-		width:126px; height:24px;
+		width:139px; height:24px;
+	}
+
+
+	#artboard {
+		margin-top: 0;
+		background-color: #CCC;
 	}
 
 	#container {
-		width:100%;
+		margin-left:$kPage_posX - 14px;
+		#metas {
+			margin:50px auto 0 auto; width:$kPage_W; background:#f9f9f9; position:relative; @include clearfix; z-index:1; box-shadow:0 -1px 4px #9F9F9F;
+			header {
+				padding-left:25px; height:27px; line-height:20px; cursor:pointer; @include linear-gradient(#fff, #f9f9f9); font-weight:bold;
+				>a { @include fullTriangle(5px, right, #000); left:10px; top:9px; }
+				h1 { float:left; font-size:16px; color:$kColor_dh1; padding:3px; }
+				h2 { float:right; margin-right:5px; color:#666; padding:3px 1px; text-align:right; @include TEXT_CLIP; }
+			}
+			form {
+				display:none;
+			}
+			&.details {
+				header>a { @include fullTriangle(5px, bottom, #000); }
+				form { display:block; }
+			}
+			fieldset {
+				margin:12px; padding:6px;
+				legend { display:inline; width:auto; }
+				&.half {
+					width:45%; float:left;
+					label { width:22%; }
+					input,textarea { width:70%; }
+				}
+				&#fAuthors {
+					>div {
+						padding-bottom:5px; margin-bottom:5px; border-bottom:1px dashed #666; position:relative;
+						.btn.delete { position:absolute; right:0; top:0; }
+						input { width:63%; }
+					}
+				}
+			}
+		}
+		#content {
+			padding:0 1em; background-color: #ccc;
+			#editor {
+				#canvas {
+					margin:auto; border-top:0;
+					padding: ($kPage_marginT - $kTitleSpacing) $kPage_marginL $kPage_marginB $kPage_marginR;
+					width:($kPage_W - $kPage_marginL - $kPage_marginR);
+				}
+			}
+		}
 	}
 
-	#artboard {
-	    margin-top: 40px;
-	    background-color: #CCC;
-	}
 
-	#canvas {
-	    margin-top: 0;
-	}
 
-	#content {
-	    padding: 1em 1em;
-	    background-color: #CCC;
-	}
 
 	#statusmessage {
-	    height: 0;
+		height: 0;
 	}
 
 	#statusmessage div {
-	    text-align: center;
-	    margin-bottom: 0.25em;
+		text-align: center;
+		margin-bottom: 0.25em;
 
-	    border: 1px solid #f0f000;
-	    background-color: #ffffe0;
+		border: 1px solid #f0f000;
+		background-color: #ffffe0;
 
-	    font-weight: bold;
-	    padding: .75em 1em;
-	    margin: auto;
-	    display: inline;
-	    -moz-box-shadow:    3px 3px 2px 2px #ddd;
-	    -webkit-box-shadow: 3px 3px 2px 2px #ddd;
-	    box-shadow:         3px 3px 2px 2px #ddd;
-	    z-index: 1010;
-	    position: relative;
+		font-weight: bold;
+		padding: .75em 1em;
+		margin: auto;
+		display: inline;
+		-moz-box-shadow:    3px 3px 2px 2px #ddd;
+		-webkit-box-shadow: 3px 3px 2px 2px #ddd;
+		box-shadow:         3px 3px 2px 2px #ddd;
+		z-index: 1010;
+		position: relative;
 	}
 
 	#statusmessage div.error {
-	    background-color: red;
+		background-color: red;
 	}
 
 	#statusmessage .persistent-error i {
-	    display: block;
-	    position: absolute;
-	    top: 0;
-	    right: 0;
-	    cursor: pointer;
-	    margin-left: -9999px;
-	    background-image: url("../images/remove-01.png");
-	    height: 16px;
-	    width: 16px;
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		cursor: pointer;
+		margin-left: -9999px;
+		background-image: url("../images/remove-01.png");
+		height: 16px;
+		width: 16px;
 	}
 
 	.aloha-block.title,
 	.aloha-block.title:focus,
 	.aloha-block.title:hover {
-	    outline: none !important;
-	    padding: 0;
+		outline: none !important;
+		padding: 0;
 	}
 
 	.aloha-block {
-	    box-shadow: none !important;
+		box-shadow: none !important;
 	}
 
-	#sidebar {
-		width:180px;
+	>aside {
+		position:fixed; top:50px; bottom:0; left:10px; width:$kSidebar_W; background:#eee; padding:6px;
+		>header {
+			font:{size:11px; weight:bold; } text-align:center; margin-bottom:10px; padding-bottom:6px;
+		}
+		>h2 {
+			font-size:11px; margin:20px 0 4px 0;
+		}
+		a {
+			color:$kColor_dh1; font-size:11px; text-shadow:1px solid rgba(0,0,0,0.25); margin:0 5px 0 3px; display:block; line-height:20px;
+			img { margin:-5px 5px 0 0; @include ALPHA(50); }
+			&:hover { box-shadow:rgba(0,0,0,0.3); }
+		}
+
+		p { font-size:11px; margin:3px; padding:0; }
+		span { display:inline; line-height:100%; }
+		#counters { letter-spacing:-1px; }
+		#wordsCount { font-weight:bold; letter-spacing:0; }
+	}
+
+
+	.ui-widget-content {
+		border:0;
+	}
+	.ui-autocomplete.ui-menu {
+		li.ui-menu-item { @include TEXT_CLIP(); width:600px; }
+	}
+
+	footer {
+		position:fixed; bottom:0; left:$kPage_posX; right:0; padding:0 1em 0 0;
 		>div {
-			border-top:1px solid #999;
-			margin-top:40px;
-			&:first-child { border:none; }
-		}
-		#draggableParts {
-			margin-top: 20px; width: 100%;
-		}
-		#citations {
+			width:$kPage_W - ($kPage_marginR+$kPage_marginL) - 1px; padding:0 $kPage_marginR 0 $kPage_marginL; margin:auto; position:relative;
+			background:#fff; box-shadow:0 -1px 2px rgba(0,0,0,0.2);
+			h2 {
+				padding:2px 0 6px 0;
+				font-size:14px; color:$kColor_dh1; font-weight:bold; cursor:pointer;
+				>a { @include fullTriangle(5px, right, #000); left:10px; top:6px; }
+			}
+			#citations {
+				display:none;
+				#citationsList {
+//					position:absolute; top:0; bottom:45px; left:0; right:0; overflow-y:auto; overflow-x:hidden; background:#eee; box-shadow:inset 0 0 3px rgba(0,0,0,0.5); padding:5px;
+					ol.references { font-size:11px; margin:5px; list-style-type:decimal; list-style-position:inside; }
+				}
+			}
+			&.details {
+				>h2>a { @include fullTriangle(5px, bottom, #000); top:8px; }
+				#citations { display:block; }
+			}
 		}
 	}
+}
+
+#wait {
+	position:fixed; z-index:$kZ_wait; top:0; right:0; bottom:0; left:0; background:#fff; @include ALPHA(90);
+	img { display:block; margin:25% auto; }
+}
+
+#loginFull {
+	position:fixed; z-index:$kZ_wait; top:0; right:0; bottom:0; left:0; background:#fff; @include ALPHA(97);
+	display:none;
+	form { margin:auto; }
+	#fLogin {}
+	#fReg { display:none; }
+	.close { position:absolute; top:20px; right:20px; cursor:pointer; @include ALPHA(100); }
+}
+
+#zotero-title {
+	width:100%;
 }

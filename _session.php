@@ -6,9 +6,9 @@
  */
 
 session_start();
+include_once('_structure.php');
 include_once('_db/_db.php');
 
-define('PWD_SALT', md5('gcd2'));
 $GLOBALS['SESSION_STATUS_OK'] = 0;
 $GLOBALS['SESSION_STATUS_EXPIRED'] = 1;
 $GLOBALS['SESSION_STATUS_DENIED'] = 2;
@@ -40,6 +40,7 @@ if (isset($_POST['processLogin'])) {							 											//  Si un formulaire de l
 			$_SESSION['user_id'] = $user['id'];																//  Stocke le user-id pour un usage ultérieur (logs,...)
 			$_SESSION['user_granted'] = explode(',', $user['account']);										//
 			$_SESSION['account_status'] = $user['status'];													//
+			$_SESSION['last_doc'] = db_fetch(db_s('papers', array('user_id' => $_SESSION['user_id']), array('date_updated' => 'DESC')));
 			db_x('UPDATE users SET date_last_login="'.date('Y-m-d H:i:s').'" WHERE id="'.$user['id'].'";');
 		}																									//  Comme la session est maintenant ouverte, le reste sera traité plus bas...
 		else {																								//
@@ -82,8 +83,8 @@ function checkSession($grant) {
 }
 
 function sessionLogout() {
-	session_destroy();													// Ferme la session
 	$lang = $_SESSION['lang'];
+	session_destroy();													// Ferme la session
 	unset($_SESSION);													// Détruit les variables encore en mémoire
 	session_start();													// Démarre une nouvelle session
 	$_SESSION['lang'] = $lang;

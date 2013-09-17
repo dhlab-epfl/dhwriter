@@ -45,11 +45,11 @@
 	-ms-user-select: none;
 	user-select: none;
 }
-/*
+
 @mixin SMOOTH($time) {
 	@include transition(all $time ease);
 }
-*/
+
 @mixin SCROLL_Y {
 	overflow:hidden;
 	overflow-x:hidden;

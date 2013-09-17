@@ -2,7 +2,14 @@
 
 form { margin:0; }
 form label { display:block; width:80px; float:left; text-align:right; font-size:0.9em; margin-left:5px; margin:4px 5px 0 0; white-space:nowrap; height:1em; color:#333; @include user-select(none); }
-
+label.error {
+	float:none;
+	width:auto;
+	color:#c00;
+	margin-left: 10px;
+	width: auto;
+	display: inline;
+}
 // ____________________________________________________________________________________________________________
 
 
@@ -108,10 +115,10 @@ div.fu {
 fieldset {
 	border:1px solid #999;
 	border-radius:5px;
-}
-legend {
-	font-size:9px;
-	padding:0 3px 0 1px;
+	legend {
+		font-size:9px;
+		padding:0 3px 0 1px;
+	}
 }
 
 li fieldset {

@@ -1,7 +1,7 @@
-
-#editor>#canvas {
+#canvas {
 	counter-reset:citation;
 	line-height:1.4em; color:#444;
+	font-size:12px;
 	.document_title  {
 		color:#000; font:{size:28px;weight:normal}; border-bottom:1px solid $kColor_dh1;
 	}
@@ -9,11 +9,38 @@
 		color:$kColor_dh1; font-weight:bold; border:0; letter-spacing:0;
 	}
 	h1 {
-		font-size:20px;
+		font-size:16px;
+	}
+	h2 {
+		font-size:14px;
+		margin:1em 0 0.5em 0;
+	}
+	h3 {
+		font-size:13px;
+		margin:0.5em 0;
+	}
+	p {
+		margin-bottom:5px;
+	}
+	strong {
+		font-weight:bold;
+	}
+	em {
+		font-style:italic;
+	}
+	pre {
+		margin: 10px 0 10px 20px; padding:5px; background:#f9f9f9; font-family:monospace; border:1px dotted #ccc;
+	}
+	bdo {
+		direction: rtl; unicode-bidi: bidi-override;
 	}
 	q {
 		color:#000;
 		&:first-letter { color:$kColor_dh1; }
-		>sup>a { color:$kColor_dh1; &:after { content:"[" counter(citation) "]"; counter-increment:citation; } }
+	}
+	cite {
+		vertical-align:super; line-height:normal; font-size:smaller; display:inline-block; margin-top:-3px; color:$kColor_dh1; cursor:pointer; &:after { content:"[" counter(citation) "]"; counter-increment:citation; }
+		&:hover { background:#E5EEF5; }
+		>span { display:none; }
 	}
 }

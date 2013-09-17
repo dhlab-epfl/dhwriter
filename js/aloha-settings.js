@@ -23,8 +23,8 @@
             assorted: {
                 image: {
                     preview: true,
-                    uploadurl: '/upload.php',
-                    uploadMultipart: false
+                    uploadSinglepart: true,
+                    uploadurl: '/upload.php'
                 }
             },
             genericbutton: {
@@ -33,15 +33,15 @@
             toolbar: {
                 formats: {
                   'p':   'Normal Text',
-                  'h1':  'Heading',
-                  'h2':  'Subheading',
-                  'h3':  'SubSubHeading',
-                  'q':   'Quotation',
-                  'pre': 'Code'
+                  'h2':  'Chapter Heading',
+                  'h3':  'Section Heading',
+                  'h4':  'Subsection Heading',
+                  'pre': 'Code',
+                  'bdo': 'Right-to-Left'
                 }
             },
             format: {
-                config : ['b', 'i', 'u', 'p', 'sub', 'sup', 'h1', 'h2', 'h3']
+                config : ['b', 'i', 'u', 'p', 'sub', 'sup', 'h2', 'h3', 'h4', 'pre', 'bdo']
             },
             table: {
                 editables: {
@@ -60,7 +60,7 @@
                 rootTags: ['span', 'div', 'figure'],
                 dragdrop: "1"
             },
-		    'dom-to-xhtml': {
+			'dom-to-xhtml': {
 		    },
             zotero: {
             	referenceContainer: '#citationsList'

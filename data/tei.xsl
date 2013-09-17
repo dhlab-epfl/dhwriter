@@ -52,37 +52,6 @@
 					<p n="session">LP22</p>
 				</sourceDesc>
 			</fileDesc>
-
-			<profileDesc>
-				<textClass>
-					<keywords scheme="original" n="category">
-						<term>Paper</term>
-					</keywords>
-					<keywords scheme="original" n="subcategory">
-						<term>Long Paper</term>
-					</keywords>
-					<keywords scheme="original" n="keywords">
-						<term>Image-based electronic editions</term>
-						<term>Text-image linking</term>
-					</keywords>
-					<keywords scheme="original" n="topic">
-						<term>image processing</term>
-						<term>encoding &#8212; theory and practice</term>
-						<term>digitisation, resource creation, and discovery</term>
-						<term>scholarly editing</term>
-						<term>digitisation &#8212; theory and practice</term>
-						<term>linking and annotation</term>
-					</keywords>
-				</textClass>
-			</profileDesc>
-
-			<revisionDesc>
-				<change>
-					<date when="2013-04-01"></date>
-					<name>Laura Weakly</name>
-					<desc>Initial encoding</desc>
-				</change>
-			</revisionDesc>
 		</teiHeader>
 	</xsl:template>
 
@@ -109,6 +78,13 @@
 			<body>
 				<xsl:apply-templates/>
 			</body>
+			<back>
+				<div type="References">
+					<listBibl>
+						<xsl:apply-templates select="*/q"/>
+					</listBibl>
+				</div>
+			</back>
 		</text>
 	</xsl:template>
 
@@ -186,6 +162,12 @@
 		</hi>
 	</xsl:template>
 
+	<!-- References -->
+	<xsl:template match="q">
+		<bibl>
+			<hi rend="bold"><xsl:value-of select="@data-reference"/></hi>
+		</bibl>
+	</xsl:template>
 
 	<!-- ignored HTML tags -->
 	<xsl:template match="link"></xsl:template>
