@@ -1,0 +1,43 @@
+.aloha-zotero-button {
+	background: url(../img/icon_zotero.png) no-repeat !important;
+}
+.aloha-zotero-block-button {
+	background: url(../img/blockquote.png) no-repeat !important;
+	border: 1px solid none !important;
+	border-radius: 3px 3px 3px 3px;
+    height: 44px !important;
+    width: 54px !important;
+}
+.aloha-zotero-pressed {
+	border: 2px solid #3B73D7 !important;
+}
+
+.aloha-zotero-wrapper {
+	/* background: #efd25d; */
+	/* background: rgba(0, 0, 0, 0.1); */
+}
+q.aloha-zotero-wrapper {
+	/* background: #ffd25d; */
+}
+blockquote.aloha-zotero-wrapper {
+	/* background: #dfd25d; */
+}
+
+/* background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3);
+box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 7px 0 rgba(0, 0, 0, 0.8) inset; */
+
+.aloha-zotero-panel-label {
+	padding: 5px;
+}
+.aloha-zotero-panel-field {
+}
+.aloha-zotero-panel-btns {
+	padding: 5px;
+}
+.aloha-zotero-panel-btns button {
+	width: 100%;
+}
+
+#zoteroModal {
+	width:700px;
+}

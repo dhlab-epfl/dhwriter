@@ -1,0 +1,122 @@
+.image-options {
+    background-color: #F1F6FA;
+    background-position: center top;
+    background-repeat: no-repeat;
+    border: 2px dashed #999999;
+    margin: 0.5em 0;
+    padding: 5em;
+    position: relative;
+    text-align: center;
+    height: 176px;
+    overflow: hidden;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.image-options .placeholder.preview img {
+    max-height: 156px;
+}
+
+form.plugin.image textarea {
+    width: 99%;
+    padding: 0.25em;
+}
+
+form.plugin.image .upload-url-input,
+form.plugin.image .upload-image-input {
+    width: 98%;
+}
+
+form#linkModal:focus {
+    outline: none;
+}
+
+.media.aloha-oer-block {
+    display: block;
+    border: 0;
+}
+
+.media.aloha-oer-block .image-wrapper {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit {
+    position: absolute;
+    cursor: pointer;
+    left: 100%;
+    padding: 2px 10px 2px 5px;
+    border-radius: 0 4px 4px 0;
+    width: 100px;
+    word-wrap: break-word;
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit:hover{
+  cursor: pointer;
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit:not(.passive):hover{
+  border: 1px dotted #1B86D2;
+  background-color: #D9E7F1;
+  z-index: 400;
+  width: 100px;
+  word-wrap: break-word;
+}
+
+/* Taken from "sandeep" at 
+   http://stackoverflow.com/questions/9450733/css-triangle-custom-border-color 
+   adds clever sidewise triangle to the warning rectangle
+*/
+.media.aloha-oer-block .image-wrapper .image-edit:not(.passive):hover:before{
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 401;
+  left: -9px;
+  top: 10px;
+  width: 14px;
+  height: 14px;
+  background: #d9e7f1;
+  border-left: 1px dotted #1b86d2;
+  border-bottom: 1px dotted #1b86d2;
+  -moz-transform:rotate(45deg);
+  -webkit-transform:rotate(45deg);
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit .warning-text{
+  color: #555;
+  font-style: italic;
+  background-color: #fff;
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit:hover .warning-text{
+  color: black;
+  font-style: normal;
+  font-size: .85em;
+  background-color: transparent;
+}
+
+.media.aloha-oer-block .image-wrapper .image-edit.passive {
+    display: none;
+}
+
+.semantic-container.focused .media.aloha-oer-block .image-wrapper .image-edit {
+    display: block;
+}
+
+i.icon-warning {
+  background-image: url(../img/warning-01.png);
+  background-position: 0 0;
+  margin-right: 4px;
+  margin-left: 4px;
+  width: 16px;
+}
+
+.warning-text {
+    background-color: #FFFFFF;
+    color: #555555;
+    font-style: italic;
+}

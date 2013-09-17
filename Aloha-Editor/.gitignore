@@ -1,0 +1,13 @@
+.project
+.settings
+.DS_Store
+target
+doc/guides/staging
+*.js~
+*.orig
+*.swp
+.externalToolBuilders
+node_modules
+src/plugins/extra/math/lib/math-plugin-orig.js
+doc/guides/output
+local.html

@@ -1,0 +1,38 @@
+.semantic-drag-source .exercise:before {
+    content: "Exercise";
+}
+.exercise {
+    min-height: 50px;
+}
+
+.exercise .problem {
+  background-color: inherit;
+  margin: 10px;
+}
+.exercise .solution .body {
+  background-color: inherit;
+}
+
+.semantic-container .exercise .solution-placeholder {
+    color: #AAA;
+    padding: 5px;
+    border: 1px dashed #ccc;
+    display: none; 
+}
+.semantic-container.active > .exercise > .solution-placeholder {
+    display: block; 
+}
+
+.exercise .solution-controls {
+    text-align: center;
+}
+.exercise .solution-controls a {
+    text-decoration: none;
+    color: blue !important;
+}
+.exercise .solution-controls .solution-toggle {
+    text-transform: uppercase;
+}
+.exercise .solution-controls .solution-toggle:before {
+    content: " | ";
+}
