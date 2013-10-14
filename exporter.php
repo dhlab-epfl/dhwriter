@@ -2,7 +2,7 @@
 	date_default_timezone_set('Europe/Zurich');
 	include('_session.php');
 	include_once('_phptoolbox.php');
-	require('lib/pdf/fpdf.php');
+	require('lib/mpdf/mpdf.php');
 
 	// =========================================================================================================================================================
 	function xslt($xml, $xsl_file) {
@@ -10,6 +10,9 @@
 		$xsldoc = new DOMDocument();
 		$xsldoc->load($xsl_file);
 		$xsl->importStyleSheet($xsldoc);
+		$xsl->setParameter('', 'FOLDER', '');
+		$xsl->setParameter('', 'DATE_CREATED', date('Ymd'));
+		$xsl->setParameter('', 'TIME_CREATED', date('H:i:s'));
 
 		$xmldoc = new DOMDocument();
 		$xmldoc->loadXML($xml);
@@ -17,27 +20,39 @@
 	}
 
 	// =========================================================================================================================================================
-	function html($paper) {
+	function html($paper, $authors_r, $standalone=false) {
 		$authors = array();
-		$html = '<html>';
-			$html.= '<head>';
-				$html.= '<title>'.$paper['title'].'</title>';
-				$html.= '<link rel="stylesheet" type="text/css" href="http://dhwriter.org/s/papers.css"></link>';
-				$html.= '<meta name="description" content="'.$paper['abstract'].'" />';
-				$a_r = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
-				while ($author = db_fetch($a_r)) {
-					$authors[] = array($author['last_name'].','.$author['first_name'], $author['affiliation'], $author['email']);
-					$html.= '<meta name="author" content="'.$author['last_name'].','.$author['first_name'].';'.$author['affiliation'].';'.$author['email'].'" />';
-				}
-			$html.= '</head>';
-			$clearHeader = '<h1>'.$paper['title'].'</h1><ul id="authors">';
-			foreach ($authors as $a) {
-				$clearHeader.= '<li>'.$a[0].'<br/>'.$a[1].'<br/>'.$a[2].'</li>';
+		$pageHeader.= '<head>';
+			$pageHeader.= '<title>'.$paper['title'].'</title>';
+			$pageHeader.= '<link rel="stylesheet" type="text/css" href="http://dhwriter.org/s/papers.css"></link>';
+			$pageHeader.= '<meta name="description" content="'.$paper['abstract'].'" />';
+			foreach ($authors_r as $author) {
+				$authors[] = array($author['last_name'].','.$author['first_name'], $author['affiliation'], $author['email']);
+				$pageHeader.= '<meta name="author" content="'.$author['last_name'].','.$author['first_name'].';'.$author['affiliation'].';'.$author['email'].'" />';
 			}
-			$clearHeader.= '</ul><fieldset><legend>Abstract</legend>'.$paper['abstract'].'</fieldset>';
-			$html.= str_replace('<body>', '<body id="canvas">'.$clearHeader, $paper['text']);
-		$html.= '</html>';
-		return $html;
+		$pageHeader.= '</head>';
+		$clearHeader = '<h1>'.$paper['title'].'</h1><ul id="authors">';
+		foreach ($authors as $a) {
+			$clearHeader.= '<li>'.$a[0].'<br/>'.$a[1].'<br/>'.$a[2].'</li>';
+		}
+		$clearHeader.= '</ul><fieldset><legend>Summary</legend>'.$paper['abstract'].'</fieldset>';
+
+		$body = preg_replace('/<(br|hr|img)([^>]*)>/', '<\1\2/>', $paper['text']).'</section><section id="references"><h2>References</h2><ol>';
+		$i=0;
+		$count = 1;
+		while ($count > 0) {
+			$i++;
+			$body = preg_replace('/<cite([^>]+)><span>([^\[][^<]*)<\/span><\/cite>(.*)/i', '<cite>['.$i.']</cite>$3<li>$2</li>', $body, 1, &$count);
+		}
+		$body.= '</ol>';
+		$pageBody = '<body><section id="header">'.$clearHeader.'</section><section id="article">'.$body.'</section></body>';
+
+		if ($standalone) {
+			return '<html>'.$pageHeader.$pageBody.'</html>';			// xmlns="http://www.w3.org/1999/xhtml"  (declaring xmlns here breaks xslt pipeline)
+		}
+		else {
+			return $pageBody;
+		}
 	}
 
 	// =========================================================================================================================================================
@@ -45,15 +60,18 @@
 	define('kOutputMode_inline', 1);
 	define('kOutputMode_block', 2);
 	define('kOutputMode_reference', 3);
-	class PDF extends FPDF {
+	class PDF extends mPDF {
 		var $HREF;
-		var $defaultStyle = array('tag' => 'body', 'size'=>12, 'font' => 'Helvetica', 'style'=>'', 'lineHeight' => 5, 'color'=>array(0,0,0));			// Initial (=default) styles
+		var $defaultStyle = array('tag' => 'body', 'size'=>12, 'font' => 'DejaVuSans', 'style'=>'', 'lineHeight' => 5, 'color'=>array(0,0,0));			// Initial (=default) styles
 		var $outputMode, $styleStack, $lineHeight;
 		var $leftMargin = 25, $topMargin = 15;
 		var $references = array();
 
 		function PDF($orientation='P', $unit='mm', $size='A4') {
-			$this->FPDF($orientation,$unit,$size); 								// Appel au constructeur parent
+#			$this->AddFont('DejaVuSans','','DejaVuSans.ttf', true);
+			$this->mPDF($orientation,$size); 								// Appel au constructeur parent
+			$this->useAdobeCJK = true;
+			$this->SetAutoFont(AUTOFONT_ALL);
 			$this->SetLeftMargin($this->leftMargin);
 			$this->SetRightMargin($this->topMargin);
 			$this->styleStack = array($this->defaultStyle);
@@ -63,10 +81,10 @@
 		}
 		function Footer() {
 			$this->SetY(-15);													// Positionnement à 1,5 cm du bas
-			$this->SetFont($this->defaultStyle['font'],'I',8);									//
+			$this->SetFont($pdf->default_font,'I',8);									//
 			$this->Cell(0, 10, $this->PageNo().' / {nb}', 0, 0,'R');			// Numéro de page
 		}
-
+/*
 		function WriteHTML($html) {
     // Parseur HTML
 			$html = str_replace("\n",' ',$html);
@@ -98,31 +116,16 @@
 						$tag = strtolower(array_shift($a2));
 						$attributes = array();
 						foreach ($a2 as $v) {
-							if (preg_match('/([^=]+)="([^>]+)/',$v,$a3))
+							if (preg_match('/([^=]+)="([^>]+)"/',$v,$a3))
 								$attributes[strtolower($a3[1])] = $a3[2];
 						}
 
-						/*
-						preg_match('/^([a-zA-Z]+)\s*(.*)/',$e,$fullTag);
-						$tag = $fullTag[1];
-						$attrPart = $fullTag[2];
-
-						if (preg_match('/([^=]+="[^"]+")+/',$e,$parts)) {
-							print_r($parts);
-						}
-						$parts = explode('"', $e);
-						$tag = strtolower(array_shift($parts));
-						$attributes = array();
-						for ($i=0; $i<(count($parts)-(count($parts)%2)); $i+=2) {
-							$attributes[$parts[$i]] = $parts[$i+1];
-						}
-						*/
 						$this->OpenTag($tag,$attributes);
 					}
 				}
 			}
 		}
-
+*/
 		function OpenTag($tag, $attr) {
     // Balise ouvrante
 			if ($tag=='br') {
@@ -255,63 +258,111 @@
 */
 	}
 
-
-	function pdf($paper) {
-		$pdf = new PDF();
+	function pdf($paper, $authors, $reviewMode=false) {
+		$pdf = new mPDF();
 		$pdf->AliasNbPages();
-// Première page
-		$pdf->AddPage();
-		$pdf->SetFont('Helvetica','',20);
-		$pdf->MultiCell(0,8,utf8_decode($paper['title']),0,'C');
-		$pdf->ln();
-		//___________________________________
-		$pdf->SetFont('Helvetica','',14);
-		$authors = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
-		while ($author = db_fetch($authors)) {
-			$pdf->Cell(75, 7, utf8_decode($author['last_name'].', '.$author['first_name']), 0, 1);
-			$pdf->Cell(75, 7, utf8_decode($author['affiliation']), 0, 1);
-			$pdf->Link($pdf->getX(), $pdf->getY(), 75, 7, 'mailto:'.$author['email']);
-			$pdf->Cell(75, 7, utf8_decode($author['email']), 0, 1);
+		if ($reviewMode) {
+			// Première page
+			$pdf->AddPage();
+			// Add a Unicode font (uses UTF-8)
+			$pdf->SetFontSize(20);
+			$pdf->MultiCell(0,8,$paper['title'],0,'C');
 			$pdf->ln();
+			//___________________________________
+			$pdf->SetFontSize(14);
+			foreach ($authors as $author) {
+				$pdf->Cell(75, 7, $author['last_name'].', '.$author['first_name'], 0, 1);
+				$pdf->Cell(75, 7, $author['affiliation'], 0, 1);
+	#			$pdf->Link($pdf->getX(), $pdf->getY(), 75, 7, 'mailto:'.$author['email']);
+				$pdf->WriteHTML('<a href="mailto:'.$author['email'].'">'.$author['email'].'</a>');
+				$pdf->Cell(75, 7, $author['email'], 0, 1);
+				$pdf->ln();
+			}
+			$pdf->ln();
+			$pdf->Cell(75, 7, @array_pop(array_filter(explode('/', $paper['category'].'/'.$paper['subcategory']))), 0, 1);
+			//___________________________________
+			$pdf->SetFontSize(16);
+			$link = str_replace('www.', '', $_SERVER['SERVER_NAME']).'/paper/'.datetime('U', $paper['date_updated']).'.'.$paper['user_id'].'.'.$paper['id'].'.'.$paper['version'].'.html';
+			$pdf->SetXY(25, 200);
+	#		$pdf->Link($pdf->getX(), $pdf->getY(), 170, 10, 'http://'.$link);
+	#		$pdf->Rect($pdf->getX(), $pdf->getY(), 170, 10);
+	#		$pdf->Cell(0, 10, 'URL:  '.$link,0,1,'C');
+			$pdf->WriteHTML('<a href="http://'.$link.'">URL: '.$link.'</a>');
 		}
-		//___________________________________
-		$pdf->SetFont('Helvetica','',16);
-		$link = str_replace('www.', '', $_SERVER['SERVER_NAME']).'/paper/'.datetime('U', $paper['date_updated']).'.'.$paper['user_id'].'.'.$paper['id'].'.'.$paper['version'].'.html';
-		$pdf->SetXY(25, 200);
-		$pdf->Link($pdf->getX(), $pdf->getY(), 170, 10, 'http://'.$link);
-		$pdf->Rect($pdf->getX(), $pdf->getY(), 170, 10);
-		$pdf->Cell(0, 10, 'Online version:  '.$link,0,1,'C');
-// Seconde page
+		// Pages suivantes (article)
 		$pdf->AddPage();
 		$pdf->SetFontSize(12);
-		$pdf->WriteHTML(utf8_decode(str_replace('’', "'", html_entity_decode($paper['text']))));
-		$pdf->WriteReferences();
+
+		$stylesheet = file_get_contents('s/pdf.css');
+		$pdf->WriteHTML($stylesheet,1);	// The parameter 1 tells that this is css/style only and no body/html/text
+		$pdf->WriteHTML(html($paper, $authors, false));
 		$pdf->Output();
+		exit;
 	}
 
-	if (isset($_REQUEST['id'])&&isset($_REQUEST['ext'])) {
-		header('Content-Disposition: attachment; filename="dh2014-abstract'.$_REQUEST['id'].'.'.$_REQUEST['ext'].'"');
-		$paper = db_fetch(db_s('papers', array('id' => $_REQUEST['id'], 'user_id' => isset($_SESSION['user_id'])?$_SESSION['user_id']:'1'), array('version' => 'DESC')));
+	function process($fileName, $paper, $authors=array(), $ext='tei', $reviewMode=false) {
+#		header('Content-Disposition: attachment; filename="'.$fileName.'.'.$_REQUEST['ext'].'"');
 		switch ($_REQUEST['ext']) {
 			case 'tei':
 				header('Content-Type: application/tei+xml');
-				$source = preg_replace('/<(br|hr|img)([^>]*)>/', '<\1\2/>', str_replace('&nbsp;', ' ', html($paper)));
+				header('Content-Type: text/plain');
+				$source = str_replace('><', ">\n<", str_replace('&nbsp;', ' ', html($paper, $authors, true)));
 				echo xslt($source, 'data/tei.xsl');
 				break;
 			case 'html':
 				header('Content-Type: text/html');
-				echo html($paper);
+				echo html($paper, $authors, true);
 				break;
 			case 'pdf':
-				header('Content-Type: application/pdf');
-				if (isset($_SESSION['user_id'])) {
+#				header('Content-Type: application/pdf');
+				if ($reviewMode && isset($_SESSION['user_id']) && isset($paper['version'])) {
 					$paper['version'] = $paper['version']+1;
 					db_i('papers', $paper);
 				}
-				echo pdf($paper);
+				echo pdf($paper, $authors, $reviewMode);
 				break;
 			default:
 				break;
 		}
 	}
+
+	if (isset($_REQUEST['ext'])) {
+		$authors = array();
+		$reviewMode = (@$_REQUEST['rev']>0);
+		if (isset($_REQUEST['id'])) {
+			// database mode
+			$paper = db_fetch(db_s('papers', array('id' => $_REQUEST['id'], 'user_id' => isset($_SESSION['user_id'])?$_SESSION['user_id']:'1'), array('version' => 'DESC')));
+			$a_r = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
+			while ($a = db_fetch($a_r)) {
+				$authors[] = $a;
+			}
+			process('dh2014-abstract'.$_REQUEST['id'], $paper, $authors, $_REQUEST['ext'], $reviewMode);
+		}
+		elseif (isset($_REQUEST['src'])) {
+			// source provided (typically unsaved document)
+			$cat = explode('/', $_REQUEST['category']);
+			$paper = array(
+							'text' => $_REQUEST['src'],
+							'title' => $_REQUEST['title'],
+							'abstract' => $_REQUEST['abstract'],
+							'date_updated' => date('Y-m-d H:i:s'),
+							'category' => $cat[0],
+							'subcategory' => $cat[1],
+							'keywords' => $_REQUEST['keywords'],
+							'topics' => $_REQUEST['topics'],
+						);
+			$a_ids = (array)$_REQUEST['author'];
+			foreach ($a_ids as $id) {
+				$authors[] = array(
+									'first_name' => $_REQUEST['first_name'.$id],
+									'last_name' => $_REQUEST['last_name'.$id],
+									'email' => $_REQUEST['email'.$id],
+									'affiliation' => $_REQUEST['affiliation'.$id],
+									);
+			}
+			process('abstract', $paper, $authors, $_REQUEST['ext'], $reviewMode);
+		}
+		else die('Error: no source data provided');
+	}
+	else die('Error: no valid format provided');
 ?>

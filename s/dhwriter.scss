@@ -87,7 +87,7 @@ body {
 // __________________________________________
 
 #editor {
-	@import "_dh_texts";
+	@import "_dh_htmlcanvas";
 }
 
 #writer {
@@ -137,7 +137,8 @@ body {
 				&#fAuthors {
 					>div {
 						padding-bottom:5px; margin-bottom:5px; border-bottom:1px dashed #666; position:relative;
-						.btn.delete { position:absolute; right:0; top:0; }
+						.drag { position:absolute; right:0; top:0; cursor:move; }
+						.btn.delete { position:absolute; right:0; bottom:17px; }
 						input { width:63%; }
 					}
 				}

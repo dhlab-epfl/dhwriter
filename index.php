@@ -1,7 +1,7 @@
 <?php
 	date_default_timezone_set('Europe/Zurich');
 	include_once('_db/_db.php');
-	include_once('_phptoolbox.php');
+	include_once('_formutils.php');
 	include_once('_structure.php');
 
 	if (isset($_REQUEST['signup'])) {		#&&@$_REQUEST['captcha']==''
@@ -30,7 +30,7 @@
 		$paper_data = array(
 						'id' => $_REQUEST['id'],
 						'title' => 'Paper created on '.date('Y-m-d, H:i'),
-						'text' => '<body><h2>1. Introduction</h2><h3>1.1. Overview</h3><p>Tell us about your research in a few words.</p><h3>1.2. Methodology</h3><p>More general details go here.</p><h2>2. Getting Started</h2><p></p></body>',
+						'text' => '<section><h2>1. Introduction</h2><h3>1.1. Overview</h3><p>Tell us about your research in a few words.</p><h3>1.2. Methodology</h3><p>More general details go here.</p><h2>2. Getting Started</h2><p></p></section>',
 						'user_id' => $_SESSION['user_id'],
 						'version' => 1,
 					);
@@ -43,6 +43,7 @@
 						'email' => $user['email'],
 						'affiliation' => $user['institution'],
 						'paper_id' => $_REQUEST['id'],
+						'user_id' => $_SESSION['user_id'],
 						'disp_order' => 1,
 					);
 		db_i('authors', $auth_data);
@@ -66,7 +67,7 @@
 	<title>DHWriter Editor</title>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" type="text/css" href="/s/dhwriter.css"></link>
-	<link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<script type="text/javascript" src="/js/aloha-oerpub.min.js"></script>
 	<!-- Mathjax -->
 	<script type="text/javascript" src="/MathJax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
@@ -86,6 +87,7 @@
 
 	<script type="text/javascript" src="/Aloha-Editor/src/lib/aloha.js" tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
 	data-aloha-plugins="common/ui,
+    oer/copy,
 	oer/toolbar,
 	oer/overlay,
 	oer/format,
@@ -111,14 +113,15 @@
 	dh/zotero"> <!-- xhtml workaround --></script>
 			<!-- Include the fake-jquery to make sure that Aloha works even if the user includes his own global jQuery after aloha.js. -->
 <?php
-	echo '<script type="text/javascript" tal:content="string:var paper_id = \'${paper_id}\';">var paper_id = '.$_REQUEST['id'].';</script>';
+	echo '<script type="text/javascript" tal:content="string:var paper_id = \'${paper_id}\';">var paper_id = '.(int)$_REQUEST['id'].';</script>';
 	echo '<script type="text/javascript" tal:content="string:var body_url = \'${body_url}\';">var body_url = "_.php?f=getPaper&id="+paper_id;</script>';
-	echo '<script type="text/javascript" tal:content="string:var save_url = \'${request.route_url(\\\'preview_save\\\')}\';">var save_url = "_.php?f=savePaper&id='.$_REQUEST['id'].'";</script>';
+	echo '<script type="text/javascript" tal:content="string:var save_url = \'${request.route_url(\\\'preview_save\\\')}\';">var save_url = "_.php?f=savePaper&id='.(int)$_REQUEST['id'].'";</script>';
 ?>
 			<script type="text/javascript" src="/js/dhwriter.min.js"></script>
 			<!--/metal:js_macro-->
 		</head>
 		<body id="writer">
+			<div id="loginFull"><img src="/i/close.png" alt="Close" class="close" /><div id="loginModal" class="loginPanel"><?php include('_loginBox.php'); ?></div></div>
 			<div id="ie6-container-wrap">
 				<div id="container">
 					<!-- ================= -->
@@ -184,7 +187,7 @@
 						<li><a href="#" class="action deletecolumn">Delete Column</a></li>
 						<li><a href="#" class="action deletetable">Delete Table</a></li>
 					</ul>
-					<button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>
+<!--					<button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>-->
 				</div>
 
 					<span class="separator"> </span>
@@ -213,7 +216,7 @@
 						<?php
 							$docs = db_x('SELECT MAX(version) AS version, id, date_updated, title FROM papers WHERE user_id="'.db_escape($_SESSION['user_id']).'" GROUP BY id;');
 							while ($doc = db_fetch($docs)) {
-								echo '<li><a href="?id='.$doc['id'].'" class="action documents '.($doc['id']==$_REQUEST['id']?'current':'').'" title="Updated on '.$doc['date_updated'].'">'.$doc['title'].' (v.'.$doc['version'].')'.'</a></li>';
+								echo '<li><a href="?id='.$doc['id'].'" class="action documents '.($doc['id']==(int)$_REQUEST['id']?'current':'').'" title="Updated on '.$doc['date_updated'].'">'.$doc['title'].' (v.'.$doc['version'].')'.'</a></li>';
 							}
 						?>
 							<li><a href="?new_paper=" class="action documents" title="Create an empty document">[+] New...</a></li>
@@ -254,8 +257,8 @@
 					</div>
 					<div id="saveload">
 						<h4>Export as...</h4>
-						<a href="/export/<?php echo $_REQUEST['id'] ?>.tei"><img src="/i/export.png" />TEI</a>
-						<a href="/export/<?php echo $_REQUEST['id'] ?>.html"><img src="/i/export.png" />HTML</a>
+						<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.tei"><img src="/i/export.png" />TEI</a>
+						<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.html"><img src="/i/export.png" />HTML</a>
 					</div>
 				</div>
 -->
@@ -263,7 +266,7 @@
 		</metal:toolbar>
 <?php
 		$user_id = isset($_SESSION['user_id'])?$_SESSION['user_id']:'1';
-		$paper = db_fetch(db_s('papers', array('id' => $_REQUEST['id'], 'user_id' => $user_id), array('version' => 'DESC')));
+		$paper = db_fetch(db_s('papers', array('id' => (int)$_REQUEST['id'], 'user_id' => $user_id), array('version' => 'DESC')));
 		if ($paper==null) {
 			echo '<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>';
 			$b = new ErrorBox();
@@ -271,10 +274,10 @@
 			$b->show();
 			die();
 		}
-		include('_formutils.php');
 
 		echo '<div id="metas">';
-			echo '<header><a></a><h1>'.$paper['title'].'</h1><h2></h2></header>';
+			$firstAuthor = db_fetch(db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC')));
+			echo '<header><a></a><h1>'.$paper['title'].'</h1><h2>'.$firstAuthor['first_name'].' '.$firstAuthor['last_name'].'</h2></header>';
 			beginForm();
 				printHiddenInput('paper_id', $paper['id']);
 				echo '<fieldset class="half"><legend>Title Statement</legend>';
@@ -282,7 +285,7 @@
 					echo '<br/>';
 					printSelectInput('Category', 'category', $paper['category'].'/'.$paper['subcategory'], array('/'=>'(choose...)', 'Paper/Short Paper' => 'Short Paper', 'Paper/Long Paper' => 'Long Paper', 'Panel/' => 'Panel', 'Poster/' => 'Poster'));
 					echo '<br/>';
-					printTextArea('Abstract', 'abstract', $paper['abstract'], 100, 10);
+					printTextArea('Summary', 'abstract', $paper['abstract'], 100, 10);
 					echo '<br/>';
 					printTextArea('Keywords', 'keywords', $paper['keywords'], 100, 2);
 					echo '<br/>';
@@ -291,7 +294,8 @@
 				echo '<fieldset class="half" id="fAuthors"><legend>Authors</legend>';
 					$authors = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
 					while ($author = db_fetch($authors)) {
-						echo '<div>';
+						echo '<div id="'.$author['id'].'">';
+							echo '<img src="/i/drag.png" class="drag" />';
 							echo '<img src="/i/delete.png" class="btn delete'.($author['disp_order']>1?'':' hidden').'" />';
 							printHiddenInput('author[]', $author['id']);
 							printTextInput('First Name', 'first_name'.$author['id'], $author['first_name'], 35);
@@ -334,12 +338,15 @@
 	<h2>Statistics</h2>
 	<p id="counters">Words: <span id="wordsCount"></span> / <span id="wordsLimit"></span></p>
 	<h2>Export</h2>
-	<a href="/export/<?php echo $_REQUEST['id'] ?>.tei"><img src="/i/export.png" />TEI</a>
-	<a href="/export/<?php echo $_REQUEST['id'] ?>.html"><img src="/i/export.png" />HTML</a>
-	<a href="/export/<?php echo $_REQUEST['id'] ?>.pdf"><img src="/i/export.png" />Review PDF</a>
+	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.tei" data-ext="tei" data-rev="0" class="export"><img src="/i/export.png" />TEI</a>
+	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.html" data-ext="html" data-rev="0" class="export"><img src="/i/export.png" />HTML</a>
+	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="0" class="export"><img src="/i/export.png" />PDF</a>
+	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="1" class="export" id="exportReview"><img src="/i/export.png" />Review PDF</a>
+	<h2>Bug report</h2>
+	<a href="mailto:cyril.bornet@epfl.ch?subject=DHWriter%20bug%20report" class="bugreport"><img src="/i/mail.png" />Submit by e-mail</a>
+	<a href="https://github.com/cyrilbornet/dhwriter/issues" class="github"><img src="/i/github.png" />Github</a>
 </aside>
 <div id="wait"><img src="/i/loading.gif" alt="…" /></div>
-<div id="loginFull"><img src="/i/close.png" alt="Close" class="close" /><div id="loginModal" class="loginPanel"><?php include('_loginBox.php'); ?></div></div>
 <script src="/js/retina.min.js"></script>
 </body>
 </html>

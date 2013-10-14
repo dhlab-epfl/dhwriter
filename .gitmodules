@@ -9,4 +9,4 @@
 	url = git://github.com/xoxco/jQuery-Tags-Input
 [submodule "Aloha-Editor"]
 	path = Aloha-Editor
-	url = git://github.com/oerpub/Aloha-Editor
+	url = git://github.com/cyrilbornet/Aloha-Editor

@@ -1,0 +1,226 @@
+/* DH 2014 styling */
+body {
+  font-family: 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 13px;
+  margin: 0 auto;
+}
+
+.document_title {
+  color: #000;
+  font-size: 28px;
+  font-weight: normal;
+  border-bottom: 1px solid #96262b;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #96262b;
+  font-weight: bold;
+  border: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 16px;
+}
+
+h2 {
+  font-size: 14px;
+  margin: 1em 0 0.5em 0;
+}
+
+h3 {
+  font-size: 13px;
+  margin: 0.5em 0;
+}
+
+p {
+  margin-bottom: 5px;
+}
+
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+pre {
+  margin: 10px 0 10px 20px;
+  padding: 5px;
+  background: #f9f9f9;
+  font-family: monospace;
+  border: 1px dotted #ccc;
+}
+
+bdo {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
+
+q {
+  color: #000;
+  display: inline;
+}
+q:first-letter {
+  color: #96262b;
+}
+
+ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+}
+
+cite {
+  line-height: normal;
+  font-size: smaller;
+  display: inline-block;
+  margin-top: -3px;
+  color: #96262b;
+  cursor: pointer;
+}
+cite:after {
+  content: "[" counter(citation) "]";
+  counter-increment: citation;
+}
+cite:hover {
+  background: #E5EEF5;
+}
+cite > span {
+  display: none;
+}
+
+span.media {
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+span.media img {
+  display: inline;
+}
+
+/* Rely on MathJax HTML+CSS output but keep the MathML in the DOM (hidden) so it gets serialized */
+math,
+.MathJax .math .annotation {
+  display: none;
+}
+
+/*
+ The math editor uses MathJax to render the math but keeps the MathML in the DOM (for saving).
+ The MathJax is discarded by ephemera when saving and the (hidden via display:none) MathML is kept.
+
+ Chromium is slowly adding support for rendering MathML natively but ignores the display:none
+ so the MathML is wrapped in a span and then hidden here
+ */
+.mathml-wrapper {
+  display: none;
+}
+
+.math-element,
+.math-element * {
+  cursor: pointer;
+  -webkit-user-modify: read-only;
+  -moz-user-modift: read-only;
+}
+
+.math-element {
+  display: inline-block;
+  position: relative;
+}
+
+.math-element:hover {
+  background-color: #E5EEF5;
+}
+
+.math-popover {
+  min-width: 40em;
+}
+
+.math-popover textarea.formula {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.math-popover .math-container {
+  position: relative;
+  margin-bottom: 1em;
+}
+
+.math-popover .math-container textarea,
+.math-popover .math-container pre {
+  margin: 0;
+  padding: 5px;
+  outline: 0;
+  border: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 100%;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.math-popover .math-container textarea {
+  /* Hide any scrollbars */
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* Remove WebKit user-resize widget */
+  resize: none;
+}
+
+.math-popover .math-container pre {
+  display: block;
+  visibility: hidden;
+}
+
+.math-element math annotation {
+  display: none;
+}
+
+.math-element-destroy {
+  display: none;
+  position: absolute;
+  right: -16px;
+  width: 16px;
+  top: -1px;
+  height: 16px;
+  background-image: url(../img/remove-01.png);
+  background-repeat: no-repeat;
+  background-position: right top;
+  cursor: pointer;
+}
+
+.math-element:hover .math-element-destroy {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.math-element .math-element-destroy:hover {
+  background-image: url(../img/remove-02.png);
+}
+
+button.done {
+  float: right;
+}
+
+cite, q {
+  display: inline;
+}
+
+#authors li {
+  width: 45%;
+  float: left;
+}
+
+fieldset {
+  border: 1px solid #dddddd;
+  padding: 10px;
+}
+
+legend {
+  color: #96262b;
+  font-weight: bold;
+}

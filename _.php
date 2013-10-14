@@ -47,6 +47,17 @@ function execute($f) {
 			}
 			else echo '0';
 			break;
+		case 'sort':
+			include('_db/_db.php');
+			$newOrders = (array)$_REQUEST['o'];
+			switch ($_REQUEST['t']) {
+				case 'authors' :
+					foreach ($newOrders as $order => $id) {
+						db_u('authors', array('id' => $id), array('disp_order' => ($order+1)));
+					}
+					break;
+			}
+			exit;	// Don't generate the rest of the page, it's useless...
 		case 'deleteAuthor':
 			include('_db/_db.php');
 			session_start();

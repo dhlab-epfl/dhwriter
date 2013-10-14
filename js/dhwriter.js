@@ -13,14 +13,17 @@ Aloha.ready(function(){
 			return $('#writer #container .toolbar .btn.nosave').length==0&&(editor.isModified()||metasModified);
 		}
 		function setPaperUnmodified() {
+			$('#exportReview').stop(false,true).fadeIn();
 			var editor = Aloha.getEditableById('canvas');
 			editor.setUnmodified();
 			metasModified = false;
 		}
 		function bindMetasForm() {
-			$('#metas>form input, #metas>form textarea, #metas>form select').unbind('input').bind('input', function(){ metasModified = true; });
+			$('#metas>form input, #metas>form textarea, #metas>form select').unbind('input').bind('input change', function(){ metasModified = true; });
 			$('#metas>form input[name=title]').unbind('input').bind('input', function(){ $('#metas>header>h1').html($(this).val()); });
-			$('#fAuthors>div').first().children('input[type=text]').first().unbind('load input').bind('load input', function(){ $('#metas>header>h2').html($(this).val()); });
+			$('#fAuthors>div').first().children('input[type=text]').slice(0,2).unbind('input').bind('input', function(){
+				$('#metas>header>h2').html($(this).parent().children('input[type=text]:eq(0)').val()+' '+$(this).parent().children('input[type=text]:eq(1)').val());
+			});
 			$('#fAuthors>div').each(function(){
 				var subForm = $(this);
 				$(this).find('.btn.delete').unbind('click touchdown').bind('click touchdown', function(){
@@ -28,6 +31,9 @@ Aloha.ready(function(){
 					subForm.slideUp(function(){$(this).remove();});
 				});
 			});
+			$('#fAuthors').sortable({handle:'.drag', containment:'parent', scroll:true, update:function(e,ui){
+				$.get('_.php', {'f':'sort', 't':'authors', 'o':$('#fAuthors').sortable('serialize')});
+			}});
 		}
 /*					agree: "required"*/
 /*					agree: "Please accept our policy"*/
@@ -42,14 +48,16 @@ Aloha.ready(function(){
 			newForm.css({'display':'none'}).find('.btn.delete').removeClass('hidden');
 			lastAuthorSubForm.after(newForm);
 			$.get('_.php', {'f':'addAuthor', 'paper_id':paper_id}, function(newId){
-				var oldId = newForm.find('input[type="hidden"]').val();
-				newForm.find('input[name="first_name'+oldId+'"]').attr('name', 'first_name'+newId);
-				newForm.find('input[name="last_name'+oldId+'"]').attr('name', 'last_name'+newId);
-				newForm.find('input[name="email'+oldId+'"]').attr('name', 'email'+newId);
-				newForm.find('input[name="affiliation'+oldId+'"]').attr('name', 'affiliation'+newId);
-				newForm.find('input').each(function(){ $(this).val(''); });
-				newForm.find('input[type="hidden"]').val(newId);
-				newForm.slideDown();
+				if (parseInt(newId,10)>0) {
+					var oldId = newForm.find('input[type="hidden"]').val();
+					newForm.find('input[name="first_name'+oldId+'"]').attr('name', 'first_name'+newId);
+					newForm.find('input[name="last_name'+oldId+'"]').attr('name', 'last_name'+newId);
+					newForm.find('input[name="email'+oldId+'"]').attr('name', 'email'+newId);
+					newForm.find('input[name="affiliation'+oldId+'"]').attr('name', 'affiliation'+newId);
+					newForm.find('input').each(function(){ $(this).val(''); });
+					newForm.find('input[type="hidden"]').val(newId);
+					newForm.slideDown();
+				}
 			});
 			bindMetasForm();
 		});
@@ -58,6 +66,13 @@ Aloha.ready(function(){
 		});
 		$('#loginFull>.close').bind('click touchdown', function(){
 			$('#loginFull').fadeOut();
+		});
+		$('aside a.export').bind('click touchdown', function(e){
+			e.preventDefault();
+			var url = 'exporter.php?ext='+$(this).data('ext')+'&rev='+$(this).data('rev');
+			var form = $('<form action="'+url+'" method="post">'+'<textarea name="src" >'+Aloha.getEditableById('canvas').getContents()+'</textarea></form>');
+			form.append($('#metas form>*').clone());
+			form.submit();
 		});
 		// ______________________________________________________________________________________________
 		function savePreview(callback_function){
@@ -149,25 +164,27 @@ Aloha.ready(function(){
 		Aloha.jQuery.get(body_url, function(data){
 			var $d = Aloha.jQuery('<div />').html(data);
 			var $editable = Aloha.jQuery('#canvas').html($d.find('>section> *'));
+			if ($editable.length > 0) {
+				// Remove the pyramid debug toolbar from the preview
+				// if it exists. This code should do nothing in production
+				$editable.find('#pDebug').remove();
+				$editable.aloha().focus();
 
-			// Remove the pyramid debug toolbar from the preview
-			// if it exists. This code should do nothing in production
-			$editable.find('#pDebug').remove();
-			$editable.aloha().focus();
-
-			MathJax.Hub.Configured();
+				MathJax.Hub.Configured();
 
 
-			window.setInterval(savePreview, kAutoSaveDelay);			// Auto-save periodically
+				window.setInterval(savePreview, kAutoSaveDelay);			// Auto-save periodically
 
-			setInterval(function() {
-				updateWordStats();
-				if (paperWasModified()) {
-					$('.btn.save').html('Save');
-					GenericButton.getButtons()["save"].enable(true);
-				}
-			}, 250);
-//			Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
+				setInterval(function() {
+					updateWordStats();
+					if (paperWasModified()) {
+						$('.btn.save').html('Save');
+						GenericButton.getButtons()["save"].enable(true);
+						$('#exportReview').stop(false,true).fadeOut();
+					}
+				}, 250);
+	//			Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
+			}
 			$('#wait').fadeOut();
 		});
 	});

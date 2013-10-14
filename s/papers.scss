@@ -1,6 +1,6 @@
 @import "_dh";
 html {
-	@import "_dh_texts";
+	@import "_dh_htmlcanvas";
 	background:#ccc;
 }
 body {
@@ -8,4 +8,4 @@ body {
 	background:#fff; box-shadow:2px 2px 20px rgba(0,0,0,0.3);
 }
 
-@import "../Aloha-Editor/src/plugins/oer/math/css/math.css";
+@import "../Aloha-Editor/src/plugins/oer/math/css/math";

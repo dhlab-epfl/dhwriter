@@ -1,7 +1,7 @@
-<xsl:stylesheet version="1.0"	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns="http://www.tei-c.org/ns/1.0"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.tei-c.org/ns/1.0"
 	xpath-default-namespace="http://www.w3.org/1999/xhtml">
 	<xsl:output method="xml" encoding="utf-8" indent="yes"/>
+	<xsl:strip-space elements="*"/>
 	<xsl:param name="FOLDER"/>
 	<xsl:param name="DATE_CREATED"/><!--20130719-->
 	<xsl:param name="TIME_CREATED"/><!--10:30:00-->
@@ -75,23 +75,43 @@
 
 	<xsl:template match="body">
 		<text type="paper">
+			<front>
+				<head><xsl:apply-templates select="section[@id='header']/h1"/></head>
+				<div>
+					<author></author>
+				</div>
+			</front>
 			<body>
-				<xsl:apply-templates/>
+				<div>
+					<xsl:apply-templates select="section[@id='article']"/>
+				</div>
 			</body>
 			<back>
 				<div type="References">
-					<listBibl>
-						<xsl:apply-templates select="*/q"/>
-					</listBibl>
+					<head><xsl:value-of select="section[@id='references']/h2"/></head>
+					<xsl:for-each select="section[@id='references']/ol">
+						<listBibl>
+							<xsl:for-each select="li">
+								<bibl>
+									<hi rend="bold"><xsl:apply-templates/></hi>
+								</bibl>
+							</xsl:for-each>
+						</listBibl>
+					</xsl:for-each>
 				</div>
 			</back>
 		</text>
 	</xsl:template>
 
+	<xsl:template match="h1|h2|h3">
+<!--	<head><xsl:apply-templates/></head>-->
+		<p rend="head"><xsl:apply-templates/></p>
+	</xsl:template>
+
 	<xsl:template match="p">
-		<p>
-			<xsl:apply-templates select="*|@*|text()|comment()"/>
-		</p>
+		<xsl:if test=".!=''">
+			<p><xsl:apply-templates select="*|@*|text()|comment()"/></p>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="p[@class='note']">
@@ -121,7 +141,6 @@
 		</item>
 	</xsl:template>
 
-
 	<xsl:template match="em">
 		<hi rend="italic">
 			<xsl:apply-templates/>
@@ -129,7 +148,8 @@
 	</xsl:template>
 
 	<xsl:template match="img">
-		<graphic url="{$FOLDER}/{substring-after(@src,'/')}">
+		<figure>
+			<graphic url="{$FOLDER}/{substring-after(@src,'/')}"></graphic>
 			<xsl:for-each select="@width">
 				<xsl:attribute name="width">
 					<xsl:value-of select="."/>
@@ -140,8 +160,7 @@
 					<xsl:value-of select="."/>
 				</xsl:attribute>
 			</xsl:for-each>
-
-		</graphic>
+		</figure>
 	</xsl:template>
 
 	<xsl:template match="pre">
@@ -162,17 +181,17 @@
 		</hi>
 	</xsl:template>
 
+	<xsl:template match="semantics">
+		<!-- formula (removed) -->
+	</xsl:template>
+
 	<!-- References -->
-	<xsl:template match="q">
-		<bibl>
-			<hi rend="bold"><xsl:value-of select="@data-reference"/></hi>
-		</bibl>
+	<xsl:template match="cite">
+		<!--<cite><xsl:value-of select="*" rend="small" /></cite>-->
 	</xsl:template>
 
 	<!-- ignored HTML tags -->
 	<xsl:template match="link"></xsl:template>
 	<xsl:template match="meta"></xsl:template>
 
-	</xsl:stylesheet>
-
-
+</xsl:stylesheet>

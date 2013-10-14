@@ -1,0 +1,9 @@
+@import "_dh";
+@import "_dh_texts";
+@import "../Aloha-Editor/src/plugins/oer/math/css/math";
+
+// Local declarations (mpdf doesn't seem to support nested tags yet)
+cite, q { display:inline; }
+#authors li { width:45%; float:left; }
+fieldset { border:$kBorder; padding:10px; }
+legend { color:$kColor_dh1; font-weight:bold; }

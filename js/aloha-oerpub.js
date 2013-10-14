@@ -7,4 +7,3 @@
 
 //@codekit-prepend "aloha-settings.js";
 //@codekit-prepend "bootstrap.min.js";
-//@codekit-prepend "../Aloha-Editor/src/lib/vendor/pubsub/js/pubsub.js";
