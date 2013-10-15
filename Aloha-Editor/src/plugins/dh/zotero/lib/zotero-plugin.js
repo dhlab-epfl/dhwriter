@@ -319,7 +319,6 @@ define([
 		},
 		showModalDialog: function($el) {
 			var that = this;
-			var href;
 			var root = Aloha.activeEditable.obj;
 			var dialog = jQuery(DIALOG_HTML);
 			dialog.attr('data-backdrop', false);
@@ -406,7 +405,7 @@ define([
 				var active;
 				evt.preventDefault();
 				if (zoteroDocTitle.val() && zoteroDocTitle.val().trim()) {
-					$el.children('span').html(zoteroDocTitle.val().trim());
+					$el.html('<span>'+zoteroDocTitle.val().trim()+'</span>');
 				}
 				active = dialog.find('.link-input[required]');
 				$el.attr('href', active.val());
@@ -415,7 +414,7 @@ define([
 			});
 			dialog.on('click', '.btn.zotero-delete', function(evt) {
 				var rawText = $el.text();
-				$el.replaceWith(rawText);
+				$el.replaceWith('');
 				that.reloadCitations(that);
 			});
 			dialog.modal('show');

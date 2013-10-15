@@ -275,7 +275,6 @@
 				$pdf->Cell(75, 7, $author['affiliation'], 0, 1);
 	#			$pdf->Link($pdf->getX(), $pdf->getY(), 75, 7, 'mailto:'.$author['email']);
 				$pdf->WriteHTML('<a href="mailto:'.$author['email'].'">'.$author['email'].'</a>');
-				$pdf->Cell(75, 7, $author['email'], 0, 1);
 				$pdf->ln();
 			}
 			$pdf->ln();
@@ -301,7 +300,7 @@
 	}
 
 	function process($fileName, $paper, $authors=array(), $ext='tei', $reviewMode=false) {
-#		header('Content-Disposition: attachment; filename="'.$fileName.'.'.$_REQUEST['ext'].'"');
+		header('Content-Disposition: attachment; filename="'.$fileName.'.'.$_REQUEST['ext'].'"');
 		switch ($_REQUEST['ext']) {
 			case 'tei':
 				header('Content-Type: application/tei+xml');
@@ -314,7 +313,7 @@
 				echo html($paper, $authors, true);
 				break;
 			case 'pdf':
-#				header('Content-Type: application/pdf');
+				header('Content-Type: application/pdf');
 				if ($reviewMode && isset($_SESSION['user_id']) && isset($paper['version'])) {
 					$paper['version'] = $paper['version']+1;
 					db_i('papers', $paper);

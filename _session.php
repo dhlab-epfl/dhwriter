@@ -83,7 +83,7 @@ function checkSession($grant) {
 }
 
 function sessionLogout() {
-	$lang = $_SESSION['lang'];
+	$lang = @$_SESSION['lang'];
 	session_destroy();													// Ferme la session
 	unset($_SESSION);													// Détruit les variables encore en mémoire
 	session_start();													// Démarre une nouvelle session

@@ -76,9 +76,11 @@
 	<xsl:template match="body">
 		<text type="paper">
 			<front>
-				<head><xsl:apply-templates select="section[@id='header']/h1"/></head>
+				<head><xsl:apply-templates select="section[@id='header']/h1/*"/></head>
 				<div>
-					<author></author>
+					<xsl:for-each select="section[@id='header']/ul[@id='authors']/li">
+						<p><xsl:value-of select="./*"/></p>
+					</xsl:for-each>
 				</div>
 			</front>
 			<body>

@@ -4,13 +4,15 @@ body {
     background-color: #CCCCCC;
 }
 
-figure {
-    counter-increment: figure;
-}
 
-figure figcaption::before {
-    content: "Figure 1." counter(figure) " ";
-    font-weight: bold;
+#writer {
+}
+#canvas {
+	counter-reset:figure citCount;
+	figure {
+		counter-increment:figCounter;
+		figcaption::before { content: "Fig. " counter(figCounter) " "; }
+	}
 }
 
 /* Hide aloha default toolbar */

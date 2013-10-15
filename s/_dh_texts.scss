@@ -38,7 +38,7 @@ ol {
 	list-style-type:decimal; margin-left:20px;
 }
 cite {
-	line-height:normal; font-size:smaller; display:inline-block; margin-top:-3px; color:$kColor_dh1; cursor:pointer; &:after { content:"[" counter(citation) "]"; counter-increment:citation; }
+	line-height:normal; font-size:smaller; display:inline-block; margin-top:-3px; color:$kColor_dh1; cursor:pointer; &:after { content:"[" counter(citCount) "]"; counter-increment:citCount; }
 	&:hover { background:#E5EEF5; }
 	>span { display:none; }
 }

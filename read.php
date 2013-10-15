@@ -51,7 +51,12 @@
 	if (isset($_GET['id'])&&isset($_GET['user_id'])&&isset($_GET['v'])&&isset($_GET['ts'])) {
 		include('_db/_db.php');
 		if ($paper = db_fetch(db_s('papers', array('user_id' => $_GET['user_id'], 'id' => $_GET['id'], 'version' => $_GET['v'])))) {
-			echo html($paper);
+			if (datetime('U', $paper['date_updated'])!=$_GET['ts']) {
+				echo '<h1>503</h1>';
+			}
+			else {
+				echo html($paper);
+			}
 		}
 		else echo '<h1>404 Not Found</h1>';
 	}

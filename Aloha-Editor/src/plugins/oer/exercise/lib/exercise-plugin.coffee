@@ -18,23 +18,24 @@ define [
         </div>
 	'''
     TYPE_CONTAINER = '''
-        <div class="type-container dropdown">
+        <div class="type-container dropdown aloha-ephemera">
             <span class="type btn-link" data-toggle="dropdown"></span>
             <ul class="dropdown-menu">
-                <li><span class="btn-link">Exercise</span></li>
-                <li><span class="btn-link">Homework</span></li>
-                <li><span class="btn-link">Problem</span></li>
-                <li><span class="btn-link">Question</span></li>
-                <li><span class="btn-link">Task</span></li>
+                <li><span class="btn-link" data-type="">Exercise</span></li>
+                <li><span class="btn-link" data-type="homework">Homework</span></li>
+                <li><span class="btn-link" data-type="problem">Problem</span></li>
+                <li><span class="btn-link" data-type="question">Question</span></li>
+                <li><span class="btn-link" data-type="task">Task</span></li>
+                <li><span class="btn-link" data-type="Worked Example">Worked Example</span></li>
             </ul>
         </div>
     '''
     SOLUTION_TYPE_CONTAINER = '''
-        <div class="type-container dropdown">
+        <div class="type-container dropdown aloha-ephemera">
             <span class="type btn-link" data-toggle="dropdown"></span>
             <ul class="dropdown-menu">
-                <li><span class="btn-link">Answer</span></li>
-                <li><span class="btn-link">Solution</span></li>
+                <li><span class="btn-link" data-type="answer">Answer</span></li>
+                <li><span class="btn-link" data-type="solution">Solution</span></li>
             </ul>
         </div>
     '''
@@ -42,61 +43,57 @@ define [
     activateExercise = ($element) ->
       type = $element.attr('data-type') or 'exercise'
 
-      $problem = $element.children('.problem').contents()
+      $problem = $element.children('.problem')
       $solutions = $element.children('.solution')
 
-      $element.children().remove()
+      $element.children().not($problem).remove()
 
       $typeContainer = jQuery(TYPE_CONTAINER)
       $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
 
       $typeContainer.find('.dropdown-menu li').each (i, li) =>
-        if jQuery(li).children('a').text().toLowerCase() == type
+        if jQuery(li).children('span').data('type') == type
           jQuery(li).addClass('checked')
 
       $typeContainer.prependTo($element)
 
-      jQuery('<div>')
-        .addClass('problem')
+      $content = $problem.contents()
+      $problem
+        .empty()
         .addClass('aloha-block-dropzone')
         .attr('placeholder', "Type the text of your problem here.")
-        .appendTo($element)
         .aloha()
-        .append($problem)
+        .append($content)
 
       jQuery('<div>')
         .addClass('solutions')
+        .addClass('aloha-ephemera-wrapper')
         .appendTo($element)
         .append($solutions)
 
       jQuery('<div>')
         .addClass('solution-controls')
+        .addClass('aloha-ephemera')
         .append('<span class="add-solution btn-link">Click here to add an answer/solution</span>')
-        .append('<span class="solution-toggle"></span>')
+        .append('<span class="solution-toggle">hide solution</span>')
         .appendTo($element)
 
       if not $solutions.length
         $element.children('.solution-controls').children('.solution-toggle').hide()
 
     deactivateExercise = ($element) ->
-      $problem = $element.children('.problem')
-      $solutions = $element.children('.solutions').children()
-      
-      if $problem.html() == '' or $problem.html() == '<p></p>'
-        $problem.html('&nbsp;')
-
-      $element.children().remove()
-
-      jQuery("<div>").addClass('problem').html(
-        jQuery('<p>').append($problem.html())
-      ).appendTo($element)
-
-      $element.append($solutions)
+      return
 
     activateSolution = ($element) ->
       type = $element.attr('data-type') or 'solution'
 
-      $body = $element.children()
+      $element.contents()
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
+
+      $body = ''
+      $body = $element.children() if $element.text().trim().length
+      
       $element.children().remove()
 
       $typeContainer = jQuery(SOLUTION_TYPE_CONTAINER)
@@ -110,16 +107,19 @@ define [
 
       jQuery('<div>')
         .addClass('body')
+        .addClass('aloha-block-dropzone')
         .appendTo($element)
         .aloha()
         .append($body)
-        .addClass('aloha-block-dropzone')
 
     deactivateSolution = ($element) ->
-      content = $element.children('.body').html()
-      $element.children().remove()
-      jQuery('<p>').append(content).appendTo($element)
-    
+      $element.children(':not(.body)').remove()
+      $element.children('.body').contents().unwrap()
+      $element.children('.body').remove()
+
+      $element.contents()
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
 
     Plugin.create('exercise', {
       getLabel: ($element) ->
@@ -139,8 +139,19 @@ define [
           deactivateExercise($element)
         else if $element.is('.solution')
           deactivateSolution($element)
+    
+      appendTo: (target) ->
+        semanticBlock.appendElement(jQuery(TEMPLATE), target)
+        
 
       selector: '.exercise,.solution' #this plugin handles both exercises and solutions
+      ignore: '.problem'
+
+      options: ($el) ->
+        if $el.is('.solution')
+          return buttons: ['settings']
+        return buttons: ['settings', 'copy']
+
       init: () ->
 
         semanticBlock.register(this)
@@ -149,15 +160,15 @@ define [
           click: -> semanticBlock.insertAtCursor(TEMPLATE)
 
         semanticBlock.registerEvent('click', '.exercise .solution-controls .add-solution', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
 
           controls.children('.solution-toggle').text('hide solution').show()
 
-          semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'))
+          semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.children('.solutions'))
         )
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
           solutions = exercise.children('.solutions')
 
@@ -169,7 +180,7 @@ define [
 
         )
         semanticBlock.registerEvent('click', '.exercise .semantic-delete', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
           controls.children('.add-solution').show()
           controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
@@ -178,11 +189,10 @@ define [
                                               .aloha-oer-block.exercise > .type-container > ul > li > *', (e) ->
           $el = jQuery(@)
           $el.parents('.type-container').first().children('.type').text $el.text()
-          $el.parents('.aloha-oer-block').first().attr 'data-type', $el.text().toLowerCase()
+          $el.parents('.aloha-oer-block').first().attr 'data-type', $el.data('type')
 
           $el.parents('.type-container').find('.dropdown-menu li').each (i, li) =>
             jQuery(li).removeClass('checked')
-            if jQuery(li).children('a').text() == $el.text()
-              jQuery(li).addClass('checked')
+          $el.parents('li').first().addClass('checked')
         )
     })

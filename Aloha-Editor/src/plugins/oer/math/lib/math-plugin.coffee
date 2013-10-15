@@ -114,23 +114,30 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     el.parents('.aloha-editable').first().focus()
 
 
-  getMathFor = (id) ->
-    jax = MathJax?.Hub.getJaxFor id
+  getMathFor = (el) ->
+    jax = MathJax.Hub.getJaxFor el
     if jax
-      mathStr = jax.root.toMathML()
-      jQuery(mathStr)
+      return jQuery(jax.root.toMathML())
+    return null
 
   squirrelMath = ($el) ->
     # `$el` is the `.math-element`
 
-    $mml = getMathFor $el.find('script').attr('id')
-
-    # STEP3
-    $el.find('.mathml-wrapper').remove()
-    $mml.wrap '<span class="mathml-wrapper aloha-ephemera-wrapper"></span>'
-    $el.append $mml.parent()
+    $mml = getMathFor $el.find('script')[0]
+    if $mml != null
+      # STEP3
+      $el.find('.mathml-wrapper').remove()
+      $mml.wrap '<span class="mathml-wrapper aloha-ephemera-wrapper"></span>'
+      $el.append $mml.parent()
+    else
+      console?.warn($el, 'has no associated Jax. Does this happen too often?')
 
   Aloha.bind 'aloha-editable-created', (evt, editable) ->
+
+    # only process math if it is the editor editable that is being created
+    if editable.obj.is(':not(.aloha-root-editable)')
+      return
+
     # Bind ctrl+m to math insert/mathify
     editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
       insertMath()
@@ -144,6 +151,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     jQuery.each $maths, (i, mml) ->
       $mml = jQuery(mml)
       $mathElement = $mml.parent().parent()
+
+      $mml.clone().wrap('<span class="mathml-wrapper aloha-ephemera-wrapper"></span>').parent().appendTo($mathElement)
       # replace the MathML with ASCII/LaTeX formula if possible
       mathParts = findFormula $mml
       if mathParts.mimeType in MATHML_ANNOTATION_MIME_ENCODINGS
@@ -181,7 +190,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       # child.
       evt.stopPropagation()
 
-    editable.obj.on('click.matheditor', '.math-element-destroy', () ->
+    editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
       jQuery(e.target).tooltip('destroy')
       $el = jQuery(e.target).closest('.math-element')
       # Though the tooltip was bound to the editor and delegates
@@ -212,7 +221,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
   insertMathInto = ($container) ->
     $math = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>')
     $container.html($math)
-    $math.trigger 'show'
+    $math.trigger 'show-popover'
     
   insertMath = () ->
     $el = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera">&#160;</span></span>') # nbsp
@@ -225,13 +234,13 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     else
       # Assume the user highlighted ASCIIMath (by putting the text in backticks)
       formula = range.getText()
-      $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open +
+      $el.find('.mathjax-wrapper').text(LANGUAGES['math/tex'].open +
                                         formula +
-                                        LANGUAGES['math/asciimath'].close)
+                                        LANGUAGES['math/tex'].close)
       GENTICS.Utils.Dom.removeRange range
       GENTICS.Utils.Dom.insertIntoDOM $el, range, Aloha.activeEditable.obj
       triggerMathJax $el, ->
-        addAnnotation $el, formula, 'math/asciimath'
+        addAnnotation $el, formula, 'math/tex'
         makeCloseIcon($el)
         Aloha.Selection.preventSelectionChanged()
         placeCursorAfter($el)
@@ -277,7 +286,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     # Set the formula in jQuery data if it hasn't been set before
     #$span.data('math-formula', $span.data('math-formula') or $span.attr('data-math-formula') or $span.text())
 
-    mimeType = $span.find('script[type]').attr('type') or 'math/asciimath'
+    mimeType = $span.find('script[type]').attr('type') or 'math/tex'
     # tex could be "math/tex; mode=display" so split in the semicolon
     mimeType = mimeType.split(';')[0]
 

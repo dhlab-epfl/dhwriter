@@ -36,6 +36,7 @@ function db_o() {
 			die();																											//  En cas d'erreur de connexion, on arrête tout !
 		}
 		mysql_select_db($GLOBALS['DBName'], $GLOBALS['db_link']);															// Sélectionne la base de données
+		mysql_set_charset('UTF8');
 	}
 	return $GLOBALS['db_link'];
 }

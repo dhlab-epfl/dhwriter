@@ -198,7 +198,7 @@ define([
 
 	/**
 	 * Prepare the nodes around where pasted content is to land.
-	 * 
+	 *
 	 * @param {WrappedRange} range
 	 */
 	function prepRangeForPaste(range) {
@@ -244,6 +244,7 @@ define([
 			}
 
 			restoreSelection(range);
+			if (content.indexOf("webkit-fake-url://") != -1) return;		// https://github.com/jejacks0n/mercury/issues/179
 			prepRangeForPaste(range);
 
 			if (Aloha.queryCommandSupported('insertHTML')) {

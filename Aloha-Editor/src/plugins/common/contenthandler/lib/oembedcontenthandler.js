@@ -1,9 +1,9 @@
 /* oembedcontenthandler.js is part of Aloha Editor project http://aloha-editor.org
  *
- * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor. 
+ * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor.
  * Copyright (c) 2010-2012 Gentics Software GmbH, Vienna, Austria.
- * Contributors http://aloha-editor.org/contribution.php 
- * 
+ * Contributors http://aloha-editor.org/contribution.php
+ *
  * Aloha Editor is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
+ *
  * As an additional permission to the GNU GPL version 2, you may distribute
  * non-source (e.g., minimized or compacted) forms of the Aloha-Editor
  * source code without the copy of the GNU GPL normally required,
@@ -80,11 +80,11 @@ function(Aloha, jQuery, ContentHandlerManager) {
 	    jQuery.fn.oembed.defaults = {
 	        maxWidth: null,
 	        maxHeight: null,
-	        embedMethod: "replace",  	// "auto", "append", "fill"		
+	        embedMethod: "replace",  	// "auto", "append", "fill"
 	        defaultOEmbedProvider: "oohembed", 	// "oohembed", "embed.ly", "none"
 	        allowedProviders: null,
 	        disallowedProviders: null,
-	        customProviders: null, // [ new jQuery.fn.oembed.OEmbedProvider("customprovider", null, ["customprovider\\.com/watch.+v=[\\w-]+&?"]) ]	
+	        customProviders: null, // [ new jQuery.fn.oembed.OEmbedProvider("customprovider", null, ["customprovider\\.com/watch.+v=[\\w-]+&?"]) ]
 	        defaultProvider: null,
 	        greedy: true,
 	        onProviderNotFound: function () { },
@@ -94,7 +94,7 @@ function(Aloha, jQuery, ContentHandlerManager) {
 			onError: function() {},
 			ajaxOptions: {}
 	    };
-	
+
 		jQuery.fn.oembed.embedCode = false;
 
 	    /* Private functions */
@@ -132,7 +132,7 @@ function(Aloha, jQuery, ContentHandlerManager) {
 
 	    function embedCode(container, externalUrl, embedProvider) {
 
-	        var requestUrl = getRequestUrl(embedProvider, externalUrl), 		
+	        var requestUrl = getRequestUrl(embedProvider, externalUrl),
 				ajaxopts = jQuery.extend({
 					url: requestUrl,
 					type: 'get',
@@ -161,7 +161,7 @@ function(Aloha, jQuery, ContentHandlerManager) {
 					error: settings.onError.call(container, externalUrl, embedProvider)
 				}, settings.ajaxOptions || { } );
 
-			jQuery.ajax( ajaxopts );        
+			jQuery.ajax( ajaxopts );
 	    };
 
 	    function initializeProviders() {
@@ -377,12 +377,12 @@ function(Aloha, jQuery, ContentHandlerManager) {
 			new jQuery.fn.oembed.OEmbedProvider("hulu", "video", ["hulu\\.com/watch/.*"], "http://www.hulu.com/api/oembed.json"),
 			new jQuery.fn.oembed.OEmbedProvider("vimeo", "video", ["http:\/\/www\.vimeo\.com\/groups\/.*\/videos\/.*", "http:\/\/www\.vimeo\.com\/.*", "http:\/\/vimeo\.com\/groups\/.*\/videos\/.*", "http:\/\/vimeo\.com\/.*"], "http://vimeo.com/api/oembed.json"),
 			new jQuery.fn.oembed.OEmbedProvider("dailymotion", "video", ["dailymotion\\.com/.+"]), // "http://www.dailymotion.com/api/oembed/" (callback parameter does not return jsonp)
-			new jQuery.fn.oembed.OEmbedProvider("scribd", "rich", ["scribd\\.com/.+"]), // ", "http://www.scribd.com/services/oembed"" (no jsonp)		
+			new jQuery.fn.oembed.OEmbedProvider("scribd", "rich", ["scribd\\.com/.+"]), // ", "http://www.scribd.com/services/oembed"" (no jsonp)
 			new jQuery.fn.oembed.OEmbedProvider("slideshare", "rich", ["slideshare\.net"], "http://www.slideshare.net/api/oembed/1"),
 			new jQuery.fn.oembed.OEmbedProvider("photobucket", "photo", ["photobucket\\.com/(albums|groups)/.*"], "http://photobucket.com/oembed/")
 			// new jQuery.fn.oembed.OEmbedProvider("vids.myspace.com", "video", ["vids\.myspace\.com"]), // "http://vids.myspace.com/index.cfm?fuseaction=oembed" (not working)
-			// new jQuery.fn.oembed.OEmbedProvider("screenr", "rich", ["screenr\.com"], "http://screenr.com/api/oembed.json") (error)		
-			// new jQuery.fn.oembed.OEmbedProvider("qik", "video", ["qik\\.com/\\w+"], "http://qik.com/api/oembed.json"),		
+			// new jQuery.fn.oembed.OEmbedProvider("screenr", "rich", ["screenr\.com"], "http://screenr.com/api/oembed.json") (error)
+			// new jQuery.fn.oembed.OEmbedProvider("qik", "video", ["qik\\.com/\\w+"], "http://qik.com/api/oembed.json"),
 			// new jQuery.fn.oembed.OEmbedProvider("revision3", "video", ["revision3\.com"], "http://revision3.com/api/oembed/")
 		];
 
@@ -395,18 +395,18 @@ function(Aloha, jQuery, ContentHandlerManager) {
 		 * @param content
 		 */
 		handleContent: function( content ) {
-			
+
 			if ( typeof content === 'string' ){
 				content = jQuery( '<div>' + content + '</div>' ).get(0);
 			} else if ( content instanceof jQuery ) {
 				content = jQuery( '<div>' ).append(content).get(0);
 			}
-			
+
 			//console.log('content in ', content);
 			//console.log('content url ', jQuery(content).text());
 			content = jQuery( content ).oembed(jQuery(content).text(), {embedMethod: "replace"});
 			//console.log('content embed ', content);
-			
+
 			var returnval = setTimeout(function() {
 				content = jQuery.fn.oembed.embedCode;
 				//console.log('content code ', content);
@@ -435,16 +435,16 @@ function(Aloha, jQuery, ContentHandlerManager) {
 		 * @return true for content pasted from word, false for other content
 		 */
 		replaceoEmbedContent: function( content ) {
-			
+
 			//console.log('container text ', jQuery(content).text());
 			//return jQuery.fn.oembed.insertCode(content, options.embedMethod, oembed);
 			//return jQuery(content).oembed( jQuery(content).text() );
-			
+
 			// check every element which was pasted.
 			/*jQuery(content).each(function() {
 				var container = jQuery(this);
 				console.log('container ', container);
-				
+
 				container.oembed( container.text() );
 			});*/
 		}
@@ -456,6 +456,6 @@ function(Aloha, jQuery, ContentHandlerManager) {
 			});
 		}*/
 	});
-	
+
 	return OEmbedContentHandler;
 });

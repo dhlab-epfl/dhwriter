@@ -80,8 +80,8 @@ cite {
   cursor: pointer;
 }
 cite:after {
-  content: "[" counter(citation) "]";
-  counter-increment: citation;
+  content: "[" counter(citCount) "]";
+  counter-increment: citCount;
 }
 cite:hover {
   background: #E5EEF5;

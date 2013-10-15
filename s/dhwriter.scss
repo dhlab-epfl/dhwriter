@@ -78,8 +78,11 @@ body {
 }
 
 #loginModal {
-	display:block; margin:50px 240px; padding:30px; border:$kBorder; border-radius:20px;
-	#fLogin { border-bottom:$kBorder; padding-bottom:30px; }
+	display:block; margin:50px auto; width:400px; padding:30px; border:$kBorder; border-radius:20px;
+	#fLogin {
+		border-bottom:$kBorder; padding-bottom:30px;
+		>p { margin-top:20px; text-align:center; }
+	}
 	label { width:135px; }
 }
 
@@ -227,7 +230,6 @@ body {
 		#counters { letter-spacing:-1px; }
 		#wordsCount { font-weight:bold; letter-spacing:0; }
 	}
-
 
 	.ui-widget-content {
 		border:0;

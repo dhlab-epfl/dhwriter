@@ -13,6 +13,7 @@
     is never part of the DOM for serializing.
  */
 .semantic-container       *[placeholder]:empty:before {
+    font-weight: normal;
     content: attr(placeholder);
     color: #AAA;
     font-style: italic;
@@ -31,7 +32,7 @@
 }
 
 /* Make titles inline so they show up next to the type dropdown if there is one */
-.aloha-oer-block > .title { display: inline; }
+.aloha-oer-block > .title { display: inline-block; }
 
 .semantic-drag-helper {
     display: block;
@@ -59,6 +60,9 @@
 .semantic-container.focused {
     border: 1px solid #ccc;
 }
+.semantic-container.copy-preview {
+    background-color: #F2F2F2;
+}
 
 .semantic-container .aloha-block-handle {
     background-image:
@@ -74,6 +78,7 @@
     margin: 5px 0 0 0;
     position: absolute;
     left: 50%;
+    top: -13px;
     display: none !important; /* override the default aloha display logic for handles */
     cursor: -moz-grab !important;
     cursor: -webkit-grab !important;
@@ -123,6 +128,22 @@
     padding: 0;
 }
 
+.semantic-controls-top {
+    position: absolute;
+    right: 3em;
+    white-space: nowrap;
+    display: none;
+}
+
+.semantic-controls-top a {
+    color: #666666 !important;
+    cursor: pointer;
+}
+
+.semantic-container.focused > .semantic-controls-top {
+    display: block;
+}
+
 .aloha-oer-block {
   padding: 20px 10px 5px 20px;
   min-height: 50px;
@@ -132,39 +153,73 @@
   border-left-color: #ccc;
 }
 
-.aloha-oer-block .type:before {
+/* Put a bullet/square before the element label/type.  Include "li *" (dropdown code) so that the check mark shares styling ... specifics will be overriden later */
+.aloha-oer-block .type:before , .aloha-oer-block .type-container li *:before{
     content: "\25A0";
-    margin-right: 3px;
+    vertical-align: top;
+    font-size: .9em;
+    display: inline-block;
+    /* The following helps to account for size/weight differences of other marks (arrow, checkmark) without things jumping around so much */
+    width: 11px;
 }
 
-.semantic-container > * > .type-container .type:before {
+.focused .aloha-oer-block .dropdown .type:before {
+    /* Change to arrow when hovering block */
     content: "\25BE";
-    margin-right: 3px;
+    /* Make adjustments so that arrow feels like same size/positioning as square */
+    font-size: 1.1em;
+    margin-left: -1px;
+    margin-right: 1px;
 }
 
 .semantic-container .type-container {
     margin-bottom: 10px;
+    position: relative;
+    padding: 5px 10px;
+    display: inline;
 }
 
-.aloha-oer-block .type {
+.aloha-oer-block .type , .aloha-oer-block .type-container li *{
     font-weight: bold;
-    margin: 5px 10px 0 5px;
-    color: #369;
+    color: #369 !important; /* Important if * is an <a> due to ID-based declaration in oerpub-content.less */
     text-decoration: none;
 }
 
 .aloha-oer-block .type-container ul.dropdown-menu {
-    margin: -1.5em 0 0 0 !important;
+    /* Put the dropdown exactly on top of current type (-1px for the dropdown's borders) */
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    margin: 0;
+    padding: 0;
 }
 
-.aloha-oer-block .type-container li {
-    list-style-type: none !important;
+.aloha-oer-block .type-container li *{
+    padding: 5px 10px;
+    line-height: normal;
+    display: block;
+    cursor: pointer;
 }
-.aloha-oer-block .type-container li.checked a:before {
-    content: "\2713";
-    margin: 0 3px 0 -14px;
+.aloha-oer-block .type-container li *:hover{
+    color: #ffffff !important; /* Important if * is an <a> due to ID-based declaration in oerpub-content.less */
+    background-color: #0081c2;
+    background-image: -moz-linear-gradient(top, #0088cc, #0077b3);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
+    background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
+    background-image: -o-linear-gradient(top, #0088cc, #0077b3);
+    background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
 }
-
+.aloha-oer-block .type-container li *:before {
+    content: ""; /* nothing if not the selected one */
+}
+.aloha-oer-block .type-container li.checked *:before {
+    content: "\2713"; /* checkmark if the selected one */
+    margin-left: -4px;
+    margin-right: 4px;
+    font-size: 1em;
+}
 .aloha-oer-block .title {
     font-size: 1em;
 }
@@ -227,4 +282,10 @@
     color: #369;
 }
 
+.aloha-oer-ephemera-if-empty:empty {
+    height: 1px;
+}
 
+.aloha-oer-block .aloha-editable {
+    min-height: 20px;
+}

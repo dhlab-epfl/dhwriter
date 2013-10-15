@@ -341,9 +341,9 @@
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.tei" data-ext="tei" data-rev="0" class="export"><img src="/i/export.png" />TEI</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.html" data-ext="html" data-rev="0" class="export"><img src="/i/export.png" />HTML</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="0" class="export"><img src="/i/export.png" />PDF</a>
-	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="1" class="export" id="exportReview"><img src="/i/export.png" />Review PDF</a>
+	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="1" id="exportReview"><img src="/i/export.png" />Review PDF</a>
 	<h2>Bug report</h2>
-	<a href="mailto:cyril.bornet@epfl.ch?subject=DHWriter%20bug%20report" class="bugreport"><img src="/i/mail.png" />Submit by e-mail</a>
+	<a href="mailto:support@dhwriter.org?subject=DHwriter%20bug%20report" class="bugreport"><img src="/i/mail.png" />Submit by e-mail</a>
 	<a href="https://github.com/cyrilbornet/dhwriter/issues" class="github"><img src="/i/github.png" />Github</a>
 </aside>
 <div id="wait"><img src="/i/loading.gif" alt="…" /></div>

@@ -1,7 +1,7 @@
 /***	Forms **********************************************************************/
 
 form { margin:0; }
-form label { display:block; width:80px; float:left; text-align:right; font-size:0.9em; margin-left:5px; margin:4px 5px 0 0; white-space:nowrap; height:1em; color:#333; @include user-select(none); }
+form label { display:inline-block; width:80px; text-align:right; font-size:0.9em; margin-left:5px; margin:4px 5px 0 0; white-space:nowrap; height:1em; color:#333; @include user-select(none); }
 label.error {
 	float:none;
 	width:auto;
@@ -111,7 +111,7 @@ div.fu {
 	.progressBar { width:200px; background:#ccc; height:10px; margin-left:20px; }
 	.progressLevel { background:red; height:100%; }
 }
-
+/*
 fieldset {
 	border:1px solid #999;
 	border-radius:5px;
@@ -125,7 +125,7 @@ li fieldset {
 	float:left;
 	width:90px;
 }
-
+*/
 img.btn {
 	margin-left:5px; padding:4px; width:16px; height:16px; cursor:pointer; border-radius:4px;
 	@include ALPHA(70);

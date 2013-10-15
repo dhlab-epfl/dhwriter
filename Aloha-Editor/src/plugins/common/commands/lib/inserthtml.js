@@ -1,9 +1,9 @@
 /* inserthtml.js is part of Aloha Editor project http://aloha-editor.org
  *
- * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor. 
+ * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor.
  * Copyright (c) 2010-2012 Gentics Software GmbH, Vienna, Austria.
- * Contributors http://aloha-editor.org/contribution.php 
- * 
+ * Contributors http://aloha-editor.org/contribution.php
+ *
  * Aloha Editor is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
+ *
  * As an additional permission to the GNU GPL version 2, you may distribute
  * non-source (e.g., minimized or compacted) forms of the Aloha-Editor
  * source code without the copy of the GNU GPL normally required,
@@ -32,13 +32,13 @@ function(Aloha, jQuery, command, selection, dom, ContentHandlerManager, console)
 	// Exported commands
 	command.register( 'inserthtml', {
 		action: function(value, range) {
-			var 
+			var
 				$editable = jQuery(dom.getEditingHostOf(range.startContainer)),
 				cac = range.commonAncestorContainer,
 				i,
 				selectedRange,
 				domNodes = [];
-			
+
 			/**
 			 * Paste the given object into the current selection.
 			 * If inserting fails (because the object is not allowed to be inserted), unwrap the contents and try with that.
@@ -51,7 +51,7 @@ function(Aloha, jQuery, command, selection, dom, ContentHandlerManager, console)
 				// try to insert the element into the DOM with limit the editable host
 				// this fails when an element is not allowed to be inserted
 				if (!dom.insertIntoDOM($object, range, $editable, false)) {
-					
+
 					// if that is not possible, we unwrap the content and insert every child element
 					 contents = $object.contents();
 
@@ -83,18 +83,18 @@ function(Aloha, jQuery, command, selection, dom, ContentHandlerManager, console)
 			} else {
 				throw "INVALID_VALUE_ERR";
 			}
-			
+
 			// get contents of container div
 			domNodes = value.contents();
-			
+
 			// check if range starts an ends in same editable host
 //			if ( !(dom.inSameEditingHost(range.startContainer, range.endContainer)) ) {
 //				throw "INVALID_RANGE_ERR";
 //			}
-			
+
 			// delete currently selected contents
 			dom.removeRange(range);
-			
+
 			for ( i = domNodes.length - 1; i >= 0; --i) {
 				// insert the elements
 				pasteElement(domNodes[i]);
@@ -110,7 +110,7 @@ function(Aloha, jQuery, command, selection, dom, ContentHandlerManager, console)
 			}
 
 			dom.doCleanup({merge:true, removeempty: true}, range, cac);
-			//In some cases selecting the range does not work properly 
+			//In some cases selecting the range does not work properly
 			//e.g. when pasting from word in an h2 after the first character in IE
 			//in these cases we should fail gracefully.
 			//TODO check why the selection is failing

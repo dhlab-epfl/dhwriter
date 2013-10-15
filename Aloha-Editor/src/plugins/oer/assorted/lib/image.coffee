@@ -2,13 +2,29 @@
 # * -----------------
 # * This plugin handles when the insertImage button is clicked and provides a bubble next to an image when it is selected
 #
-define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'semanticblock/semanticblock-plugin', 'css!assorted/css/image.css'], (Aloha, jQuery, AlohaPlugin, Image, UI, semanticBlock) ->
+define [
+  'aloha',
+  'jquery',
+  'aloha/plugin',
+  'image/image-plugin',
+  'ui/ui',
+  'semanticblock/semanticblock-plugin',
+  'css!assorted/css/image.css'],
+(
+  Aloha,
+  jQuery,
+  AlohaPlugin,
+  Image,
+  UI,
+  semanticBlock) ->
 
   # This will be prefixed with Aloha.settings.baseUrl
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
 
+  DIALOG_HTML_CONTAINER = '''
+      <form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
+
   DIALOG_HTML = '''
-    <form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Insert image</h3>
@@ -18,39 +34,112 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
             <div class="image-selection">
               <div class="dia-alternative">
                 <span class="upload-image-link btn-link">Choose an image to upload</span>
+                <input type="file" class="upload-image-input">
               </div>
               <div class="dia-alternative">
                 OR
               </div>
               <div class="dia-alternative">
                 <span class="upload-url-link btn-link">get image from the Web</span>
+                <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
               </div>
             </div>
             <div class="placeholder preview hide">
               <img class="preview-image"/>
             </div>
         </div>
-        <input type="file" class="upload-image-input" />
-        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
+        <fieldset>
+          <label><strong>Image title:</strong></label>
+          <textarea class="image-title" placeholder="Shows up above image" rows="1"></textarea>
+
+          <label><strong>Image caption:</strong></label>
+          <textarea class="image-caption" placeholder="Shows up below image" rows="1"></textarea>
+        </fieldset>
         <div class="image-alt">
           <div class="forminfo">
-            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
+            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
           </div>
           <div>
-            <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>
+            <textarea name="alt" placeholder="Enter description ..." rows="1"></textarea>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>
+        <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>
         <button class="btn action cancel">Cancel</button>
+      </div>'''
+
+  DIALOG_HTML2 = '''
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Insert image</h3>
       </div>
-    </form>'''
+      <div class="modal-body">
+        <div>
+          <strong>Source for this image (Required)</strong>
+        </div>
+        <div class="source-selection">
+          <ul style="list-style-type: none; padding: 0; margin: 0;">
+            <li id="listitem-i-own-this">
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) 
+              </label>
+            </li>
+            <li id="listitem-i-got-permission">
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: 
+              </label>
+              <div class="source-selection-allowed">
+                <fieldset>
+                  <label>Who is the original author of this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-author">
+
+                  <label>What organization owns this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-org">
+
+                  <label>What is the original URL of this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">
+
+                  <label>Permission to reuse</label>
+                  <select id="reuse-license" disabled="disabled">
+                    <option value="">Choose a license</option>
+                    <option value="http://creativecommons.org/licenses/by/3.0/">
+                      Creative Commons Attribution - CC-BY</option>
+                    <option value="http://creativecommons.org/licenses/by-nd/3.0/">
+                      Creative Commons Attribution-NoDerivs - CC BY-ND</option>
+                    <option value="http://creativecommons.org/licenses/by-sa/3.0/">
+                      Creative Commons Attribution-ShareAlike - CC BY-SA</option>
+                    <option value="http://creativecommons.org/licenses/by-nc/3.0/">
+                      Creative Commons Attribution-NonCommercial - CC BY-NC</option>
+                    <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+                      Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>
+                    <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">
+                      Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>
+                    <option value="http://creativecommons.org/publicdomain/">
+                      Public domain</option>
+                    <option>other</option>
+                  </select>
+                </fieldset>
+              </div>
+            </li>
+            <li id="listitem-i-dont-know">
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-dont-know">I don't know (skip citation for now)
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button class="btn action cancel">Cancel</button>
+      </div>'''
 
   showModalDialog = ($el) ->
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
-      dialog = jQuery(DIALOG_HTML)
+      dialog = jQuery(DIALOG_HTML_CONTAINER)
+      dialog.append(jQuery(DIALOG_HTML))
 
       # Find the dynamic modal elements and bind events to the buttons
       $imageselect = dialog.find('.image-selection')
@@ -69,8 +158,12 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
       # On submit $el.attr('src') will point to what is set in this variable
       # preserve the alt text if editing an image
-      imageSource = $el.attr('src')
-      imageAltText = $el.attr('alt')
+      $img = $el
+      imageSource  = $img.attr('src')
+      imageAltText = $img.attr('alt')
+      $figure  = jQuery( $img.parents('figure')[0] )
+      $title   = $figure.find('div.title')
+      $caption = $figure.find('figcaption')
 
       if imageSource
         dialog.find('.action.insert').removeAttr('disabled')
@@ -78,9 +171,13 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       editing = Boolean(imageSource)
 
       dialog.find('[name=alt]').val(imageAltText)
+      dialog.find('.image-title').val($title.text())
+      dialog.find('.image-caption').val($caption.text())
 
       if editing
         dialog.find('.image-options').hide()
+        dialog.find('.figure-options').hide()
+        dialog.find('.btn-primary').text('Save')
 
       # Set onerror of preview image
       ((img, baseurl) ->
@@ -109,7 +206,6 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         $placeholder.hide()
         $uploadUrl.hide()
         $uploadImage.click()
-        $uploadImage.show()
 
       dialog.find('.upload-url-link').on 'click', () ->
         $placeholder.hide()
@@ -148,14 +244,20 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         $el.attr 'src', imageSource
         $el.attr 'alt', dialog.find('[name=alt]').val()
 
+        if dialog.find('.image-title').val()
+          $title.html dialog.find('.image-title').val()
+        # else probably should remove the $title element
+
+        if dialog.find('.image-caption').val()
+          $caption.html dialog.find('.image-caption').val()
+        # else probably should remove the $caption element
+
         if altAdded
           setThankYou $el.parent()
         else
           setEditText $el.parent()
 
-        deferred.resolve(target: $el[0], files: $uploadImage[0].files)
-        $el.parents('.media').removeClass('aloha-ephemera')
-        dialog.modal('hide')
+        deferred.resolve({target: $el[0], files: $uploadImage[0].files})
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
@@ -171,37 +273,179 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         dialog.remove()
 
       # Return promise, with an added show method
-      jQuery.extend true, deferred.promise(),
-        show: (title) ->
-            if title
-              dialog.find('.modal-header h3').text(title)
-            dialog.modal 'show'
+      promise = jQuery.extend true, deferred.promise(),
+            show: (title) ->
+              if title
+                dialog.find('.modal-header h3').text(title)
+              dialog.modal 'show'
+      return {
+          dialog: dialog,
+          figure: $figure,
+          img: $img,
+          promise: promise}
+
+  showModalDialog2 = ($figure, $img, $dialog, editing) ->
+      $dialog.children().remove()
+      $dialog.append(jQuery(DIALOG_HTML2))
+
+      src = $img.attr('src')
+      if src and /^http/.test(src)
+        $dialog.find('input#reuse-url').val src
+
+      if editing
+        creator    = $img.attr 'data-lrmi-creator'
+        if creator
+          $dialog.find('input#reuse-author').val creator
+        publisher  = $img.attr 'data-lrmi-publisher'
+        if publisher
+          $dialog.find('input#reuse-org').val publisher
+        basedOnURL = $img.attr 'data-lrmi-isBasedOnURL'
+        if basedOnURL
+          $dialog.find('input#reuse-url').val basedOnURL
+        rightsUrl  = $img.attr 'data-lrmi-useRightsURL'
+        if rightsUrl
+          $option = $dialog.find('select#reuse-license option[value="' + rightsUrl + '"]')
+          if $option
+            $option.prop 'selected', true
+        if creator or publisher or rightsUrl
+          $dialog.find('input[value="i-got-permission"]').prop 'checked', true
+
+        $dialog.find('input[type=radio]').click()
+      else
+
+      $dialog.find('input[name="image-source-selection"]').click (evt) ->
+        inputs = jQuery('.source-selection-allowed').find('input,select')
+
+        if jQuery(@).val() == 'i-got-permission'
+          inputs.removeAttr('disabled')
+        else
+          inputs.attr('disabled', 'disabled')
+
+        evt.stopPropagation()
+        return
+
+      $dialog.find('li#listitem-i-own-this, li#listitem-i-got-permission, li#listitem-i-dont-know').click (evt)=>
+        $current_target = jQuery(evt.currentTarget)
+        $cb = $current_target.find 'input[name="image-source-selection"]'
+        $cb.click() if $cb
+        return
+
+      deferred = $.Deferred()
+      $dialog.off('submit').on 'submit', (evt) =>
+        evt.preventDefault() # Don't submit the form
+
+        buildAttribution = (creator, publisher, basedOnURL, rightsName) =>
+          attribution = ""
+          if creator and creator.length > 0
+            attribution += "Image by " + creator + "."
+          if publisher and publisher.length > 0
+            attribution += "Published by " + publisher + "."
+          if basedOnURL and basedOnURL.length > 0
+            baseOn = '<link src="' + basedOnURL + '">Original source</link>.'
+            baseOnEscaped = jQuery('<div />').text(baseOn).html()
+            attribution += baseOn
+          if rightsName and rightsName.length > 0
+            attribution += 'License: ' + rightsName + "."
+          return attribution
+
+        if $dialog.find('input[value="i-got-permission"]').prop 'checked'
+          creator = $dialog.find('input#reuse-author').val()
+          if creator and creator.length > 0
+            $img.attr 'data-lrmi-creator', creator
+          else
+            $img.removeAttr 'data-lrmi-creator'
+
+          publisher = $dialog.find('input#reuse-org').val()
+          if publisher and publisher.length > 0
+            $img.attr 'data-lrmi-publisher', publisher
+          else
+            $img.removeAttr 'data-lrmi-publisher'
+
+          basedOnURL = $dialog.find('input#reuse-url').val()
+          if basedOnURL and basedOnURL.length > 0
+            $img.attr 'data-lrmi-isBasedOnURL', basedOnURL
+          else
+            $img.removeAttr 'data-lrmi-isBasedOnURL'
+
+          $option = $dialog.find('select#reuse-license :selected')
+          rightsUrl = $option.attr 'value'
+          rightsName = $.trim $option.text()
+          if rightsUrl and rightsUrl.length > 0
+            $img.attr 'data-lrmi-useRightsURL', rightsUrl
+          else
+            $img.removeAttr 'data-lrmi-useRightsURL'
+
+          attribution = buildAttribution(creator, publisher, basedOnURL, rightsName)
+          if attribution and attribution.length > 0
+            $img.attr 'data-tbook-permissionText', attribution
+          else
+            $img.removeAttr 'data-tbook-permissionText'
+        else
+          $img.removeAttr 'data-lrmi-creator'
+          $img.removeAttr 'data-lrmi-publisher'
+          $img.removeAttr 'data-lrmi-isBasedOnURL'
+          $img.removeAttr 'data-lrmi-useRightsURL'
+          $img.removeAttr 'data-tbook-permissionText'
+
+        deferred.resolve({target: $img[0]})
+        $figure.removeClass('aloha-ephemera')
+
+      $dialog.off('click').on 'click', '.btn.action.cancel', (evt) =>
+        evt.preventDefault() # Don't submit the form
+        $img.parents('.semantic-container').remove() unless editing
+        deferred.reject(target: $img[0])
+        $dialog.modal('hide')
+
+      return deferred.promise()
 
   insertImage = () ->
-    template = $('<span class="media aloha-ephemera"><img /></span>')
+    template = $('<figure class="figure aloha-ephemera"><div class="title" /><img /><figcaption /></figure>')
     semanticBlock.insertAtCursor(template)
     newEl = template.find('img')
-    promise = showModalDialog(newEl)
+    blob = showModalDialog(newEl)
+    promise = blob.promise
+    $figure = blob.figure
+    $img    = blob.img
+    $dialog = blob.dialog
+    # show the dialog
+    promise.show()
 
-    promise.done (data)=>
-      # Uploading if a local file was chosen
+    source_this_image_dialog = ()=>
+      editing = false
+      return showModalDialog2($figure, $img, $dialog, editing)
+
+    promise.then( (data)=>
+      # upload image, if a local file was chosen
       if data.files.length
         newEl.addClass('aloha-image-uploading')
         @uploadImage data.files[0], newEl, (url) ->
           if url
             jQuery(data.target).attr('src', url)
           newEl.removeClass('aloha-image-uploading')
-
-    # Finally show the dialog
-    promise.show()
+      # once we start using jQuery 1.8+, promise.then() will return a new promise and we can rewrite this as :
+      #     when(promise).then(...).then(source_this_image_dialog).then(...)
+      promise2 = source_this_image_dialog()
+      promise2.then( ()=>
+        # hide the dialog on the way out
+        $dialog.modal 'hide'
+        return
+      )
+    )
+    return
 
   $('body').bind 'aloha-image-resize', ->
     setWidth Image.imageObj
 
+  getWidth = ($image) ->
+    image = $image.get(0)
+    if image
+      return image.naturalWidth or image.width
+    return 0
+
   setWidth = (image) ->
     wrapper = image.parents('.image-wrapper')
     if wrapper.length
-      wrapper.css('width', image.css('width'))
+      wrapper.width(getWidth(image)+16)
 
   setThankYou = (wrapper) ->
     editDiv = wrapper.children('.image-edit')
@@ -222,39 +466,29 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
           editDiv.find('.warning-text').text('Description missing')
 
   activate = (element) ->
-    wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
-    edit = $('<div class="image-edit">')
+    $img = element.find('img')
+    wrapper = $('<div class="image-wrapper aloha-ephemera-wrapper">')
+    edit = $('<div class="image-edit aloha-ephemera">')
 
-    img = element.find('img')
-    element.children().remove()
+    $img.wrap(wrapper)
+    setWidth($img)
 
-    img.appendTo(element).wrap(wrapper)
+    element.prepend('<div class="title"></div>') if not element.find('.title').length
+    element.append('<figcaption></figcaption>') if not element.find('figcaption').length
 
-    setEditText element.children('.image-wrapper').prepend(edit)
+    setEditText element.find('.image-wrapper').prepend(edit)
+
+    # For images, make sure the load event fires. For images loaded from cache,
+    # this might not happen.
+    $img.one 'load', () ->
+      setWidth $(this)
+    .each () ->
+      $(this).load() if this.complete
+
     element.find('img').load ->
       setWidth $(this)
 
   deactivate = (element) ->
-    img = element.find('img')
-    element.children().remove()
-    element.append(img)
-    element.attr('data-alt', img.attr('alt') || '')
-
-    # image must be contained within a media element
-    $mediaset = element.closest('.media')
-    if $mediaset.length > 0
-      $media = jQuery($mediaset[0])
-      # media must be contained in :
-      # preformat (media must be block display), para, title, label, cite, cite-title,
-      # link, emphasis, term, sub, sup, quote (media must be block display), foreign,
-      # footnote, equation, note (media must be block display), item, code (media must be block display),
-      # figure, subfigure, caption, commentary, meaning, entry, statement, proof, problem,
-      # solution, content (media must be block display), section (media must be block display)
-      legalparents = $media.parents("figure, .para, .equation, .note, .quote")
-      if legalparents.length == 0
-        # media/image appears to be orphaned (via either user editing or block moving)
-        # add a p container to keep html canonical
-        element.parents('.semantic-container').wrap('<p class="para">')
     return
 
   # Return config
@@ -262,7 +496,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     getLabel: -> 'Image'
     activate: activate
     deactivate: deactivate
-    selector: '.media'
+    selector: 'figure'
     init: () ->
       plugin = @
       UI.adopt 'insertImage-oer', null,
@@ -271,8 +505,20 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       semanticBlock.register(this)
       semanticBlock.registerEvent 'click', '.aloha-oer-block .image-edit', ->
         img = $(this).siblings('img')
-        promise = showModalDialog(img)
+
+        blob = showModalDialog(img)
+        promise = blob.promise
+        $dialog = blob.dialog
+        $figure = blob.figure
+        $img    = blob.img
+
         promise.show('Edit image')
+        promise.then  (data)=>
+          # hide the dialog on the way out
+          $dialog.modal 'hide'
+
+        return
+      return
 
     uploadImage: (file, el, callback) ->
       plugin = @

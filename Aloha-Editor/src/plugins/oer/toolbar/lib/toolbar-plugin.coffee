@@ -1,5 +1,5 @@
-define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
-    jQuery, Aloha, Plugin, Ui, PubSub) ->
+define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
+    jQuery, Aloha, Plugin, PubSub, Button) ->
 
   squirreledEditable = null
   $ROOT = jQuery('body') # Could also be configured to some other div
@@ -16,14 +16,26 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         $ROOT.find(".action.#{slot}").addClass('active') if bool
       setState: (bool) -> @setActive bool
       enable: (bool=true) ->
+        btn = $ROOT.find(".action.#{slot}")
+
+        # Fire an enable event on btn, allow enable/disable to be customised
+        evt = $.Event(bool and 'enable-action' or 'disable-action')
+        btn.trigger(evt)
+        if evt.isDefaultPrevented()
+          return
+
         # If it is a button, set the disabled attribute, otherwise find the
         # parent list item and set disabled on that.
-        if $ROOT.find(".action.#{slot}").is('.btn')
-          $ROOT.find(".action.#{slot}").attr('disabled', 'disabled') if !bool
-          $ROOT.find(".action.#{slot}").removeAttr('disabled') if bool
+        if btn.is('.btn')
+          if bool
+            btn.removeAttr('disabled')
+          else
+            btn.attr('disabled', 'disabled')
         else
-          $ROOT.find(".action.#{slot}").parent().addClass('disabled') if !bool
-          $ROOT.find(".action.#{slot}").parent().removeClass('disabled') if bool
+          if bool
+            btn.parent().removeClass('disabled')
+          else
+            btn.parent().addClass('disabled')
       disable: () -> @enable(false)
       setActiveButton: (a, b) ->
         console && console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
@@ -31,31 +43,24 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         console && console.log "#{slot} TODO:FOCUS:", a
       foreground: (a) ->
         console && console.log "#{slot} TODO:FOREGROUND:", a
+      flash: () ->
+        # Allows a plugin to flash a button, thereby grabbing the user's
+        # attention.
+        el = $ROOT.find(".action.#{slot}")
+
+        # Fire a flash event on el, allow flashing to be customised
+        evt = $.Event('flash-action')
+        el.trigger(evt)
+        if evt.isDefaultPrevented()
+          return
+
+        for i in [1..6] by 1
+          setTimeout (() -> el.toggleClass('ui-flash')), 200*i
     return new ItemRelay()
 
 
   # Store `{ actionName: action() }` object so we can bind all the clicks when we init the plugin
   adoptedActions = {}
-
-  # Hijack the toolbar buttons so we can customize where they are placed.
-  Ui.adopt = (slot, type, settings) ->
-    # publish an adoption event, if item finds a home, return the
-    # constructed component
-    evt = $.Event('aloha.toolbar.adopt')
-    $.extend(evt,
-        params:
-            slot: slot,
-            type: type,
-            settings: settings
-        component: null)
-    PubSub.pub(evt.type, evt)
-    if evt.isDefaultPrevented()
-      evt.component.adoptParent(toolbar)
-      return evt.component
-
-    adoptedActions[slot] = settings
-    return makeItemRelay slot
-
 
   # Delegate toolbar actions once all the plugins have initialized and called `UI.adopt`
   Aloha.bind 'aloha-ready', (event, editable) ->
@@ -99,10 +104,11 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
     defaults: {
       defaultFormat: 'p'
       formats:
-        'p':  'Normal Text'
-        'h1': 'Heading'
-        'h2': 'Subheading'
-        'h3': 'SubSubHeading'
+        'p':   'Normal Text'
+        'h1':  'Heading'
+        'h2':  'Subheading'
+        'h3':  'SubSubHeading'
+        'pre': 'Code'
     }
     init: ->
       toolbar = @
@@ -123,6 +129,13 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer())
         $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
         $newEl.addClass($oldEl.attr('class'))
+
+        # Generate an event, so others can act on heading changes
+        e2 = $.Event()
+        e2.type = 'change-heading'
+        e2.target = $newEl[0]
+        $newEl.trigger(e2)
+        
         # $newEl.attr('id', $oldEl.attr('id))
         # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
 
@@ -182,6 +195,24 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         evt = $.Event('aloha.toolbar.childforeground')
         evt.component = childComponent
         PubSub.pub(evt.type, evt)
+
+    adopt: (slot, type, settings) ->
+      # publish an adoption event, if item finds a home, return the
+      # constructed component
+      evt = $.Event('aloha.toolbar.adopt')
+      $.extend(evt,
+          params:
+              slot: slot,
+              type: type,
+              settings: settings
+          component: null)
+      PubSub.pub(evt.type, evt)
+      if evt.isDefaultPrevented()
+        evt.component.adoptParent(toolbar)
+        return evt.component
+
+      adoptedActions[slot] = settings
+      return makeItemRelay slot
 
     ###
      toString method
