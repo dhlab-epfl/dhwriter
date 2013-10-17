@@ -42,7 +42,7 @@
 		$count = 1;
 		while ($count > 0) {
 			$i++;
-			$body = preg_replace('/<cite([^>]+)><span>([^\[][^<]*)<\/span><\/cite>(.*)/i', '<cite>['.$i.']</cite>$3<li>$2</li>', $body, 1, &$count);
+			$body = preg_replace('/<cite([^>]+)><span>([^\[][^<]*)<\/span><\/cite>(.*)/si', '<cite>['.$i.']</cite>$3<li>$2</li>', $body, 1, &$count);
 		}
 		$body.= '</ol>';
 		$pageBody = '<body><section id="header">'.$clearHeader.'</section><section id="article">'.$body.'</section></body>';
