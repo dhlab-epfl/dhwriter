@@ -5,7 +5,9 @@ Aloha.ready(function(){
 		var metasModified = false;
 		function updateWordStats() {
 			var text = Aloha.getEditableById('canvas').getContents();
-			$('#wordsCount').html(text.trim().replace(/<([^>]*)>/gi, ' ').replace(/\s+/gi, ' ').split(' ').length);
+			var w = text.trim().replace(/<([^>]*)>/gi, ' ').replace(/\s+/gi, ' ').split(' ').length;
+			var citationsLength = $('#canvas cite>span').text().trim().replace(/<([^>]*)>/gi, ' ').replace(/\s+/gi, ' ').split(' ').length;
+			$('#wordsCount').html(w - citationsLength);
 			$('#wordsLimit').html('5000');
 		}
 		function paperWasModified() {
@@ -20,7 +22,10 @@ Aloha.ready(function(){
 		}
 		function bindMetasForm() {
 			$('#metas>form input, #metas>form textarea, #metas>form select').unbind('input').bind('input change', function(){ metasModified = true; });
-			$('#metas>form input[name=title]').unbind('input').bind('input', function(){ $('#metas>header>h1').html($(this).val()); });
+			$('#metas>form input[name=title]').unbind('input').bind('input', function(){
+				$('#metas>header>h1').html($(this).val());
+				$('#currentDocMenuItem>b').html($(this).val());
+			});
 			$('#fAuthors>div').first().children('input[type=text]').slice(0,2).unbind('input').bind('input', function(){
 				$('#metas>header>h2').html($(this).parent().children('input[type=text]:eq(0)').val()+' '+$(this).parent().children('input[type=text]:eq(1)').val());
 			});
@@ -32,7 +37,7 @@ Aloha.ready(function(){
 				});
 			});
 			$('#fAuthors').sortable({handle:'.drag', containment:'parent', scroll:true, update:function(e,ui){
-				$.get('_.php', {'f':'sort', 't':'authors', 'o':$('#fAuthors').sortable('serialize')});
+				$.get('_.php?'+$('#fAuthors').sortable('serialize'), {'f':'sort', 't':'authors'});
 			}});
 		}
 /*					agree: "required"*/
@@ -231,6 +236,11 @@ function initSignupForm() {
 $(window).ready(function(){
 	$('#metas>header, #container>footer>div>h2').bind('click touchdown', function(){
 		$(this).closest('div').toggleClass('details', 200);
+	});
+	$('.action.documents.delete').bind('click touchdown', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		window.location.href = '?delete_paper='+$('#metas>form input[name=paper_id]').val();
 	});
 	initSignupForm();
 });

@@ -1,6 +1,7 @@
 <?php
 date_default_timezone_set('Europe/Zurich');
-header('Content-Type: text/plain');
+header('Vary: Accept');
+header('Content-Type: text/plain; charset=utf-8');
 header('Cache-Control: no-cache, must-revalidate');
 
 function execute($f) {
@@ -74,7 +75,7 @@ function execute($f) {
 /*				foreach ($terms as $t) {
 					$label = str_replace($t, '<b>'.$t.'</b>', $label);
 				}*/
-				$out[] = utf8_encode($label);
+				$out[] = $label;
 			}
 			echo json_encode($out);
 			break;

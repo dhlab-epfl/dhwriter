@@ -21,6 +21,11 @@
 		$_POST['password'] = $_REQUEST['password1'];
 	}
 
+	function redirectAndDie($url) {
+		header("Location: ".$url);
+		die('<a href="'.$url.'">Click here if you are not redirected in a few seconds</a>');
+	}
+
 	include('_session.php');
 
 	if (isset($_REQUEST['new_paper'])) {
@@ -47,8 +52,12 @@
 						'disp_order' => 1,
 					);
 		db_i('authors', $auth_data);
-		header("Location: /?id=".$_REQUEST['id']);
-		die('<a href="/?id='.$_REQUEST['id'].'">Click here if you are not redirected in a few seconds</a>');
+		redirectAndDie('/?id='.$_REQUEST['id']);
+	}
+	elseif (isset($_REQUEST['delete_paper'])) {
+		db_d('papers', array('id' => $_REQUEST['delete_paper'], 'user_id' => $_SESSION['user_id']));
+		$lastPaper = db_fetch(db_s('papers', array('user_id' => $_SESSION['user_id']), array('date_updated' => 'DESC')));
+		redirectAndDie('/?id='.$lastPaper['id']);
 	}
 	elseif (!isset($_REQUEST['id'])||(int)$_REQUEST['id']==0) {
 		if (isset($_SESSION['last_doc'])&&(int)$_SESSION['last_doc']['id']>0) {
@@ -57,8 +66,7 @@
 		else {
 			$_REQUEST['id'] = 1;
 		}
-		header("Location: /?id=".$_REQUEST['id']);
-		die('<a href="/?id='.$_REQUEST['id'].'">Click here if you are not redirected in a few seconds</a>');
+		redirectAndDie('/?id='.$_REQUEST['id']);
 	}
 ?>
 <!DOCTYPE html>
@@ -214,12 +222,21 @@
 						</button>
 						<ul class="dropdown-menu">
 						<?php
-							$docs = db_x('SELECT MAX(version) AS version, id, date_updated, title FROM papers WHERE user_id="'.db_escape($_SESSION['user_id']).'" GROUP BY id;');
+							$docs = db_x('SELECT MAX(version) AS version, id, date_updated, title FROM (SELECT * FROM papers ORDER BY version DESC) AS p WHERE user_id="'.db_escape($_SESSION['user_id']).'" GROUP BY id;');
 							while ($doc = db_fetch($docs)) {
-								echo '<li><a href="?id='.$doc['id'].'" class="action documents '.($doc['id']==(int)$_REQUEST['id']?'current':'').'" title="Updated on '.$doc['date_updated'].'">'.$doc['title'].' (v.'.$doc['version'].')'.'</a></li>';
+								$current = ($doc['id']==$_REQUEST['id']);
+								echo '<li>';
+								echo '<a href="?id='.$doc['id'].'" class="action documents '.($doc['id']==(int)$_REQUEST['id']?'current':'').'" title="Updated on '.$doc['date_updated'].'" '.($current?'id="currentDocMenuItem"':'').'>';
+								echo ($current?'<b>':'').$doc['title'].($current?'</b>':'').' (v.'.$doc['version'].')';
+								echo '</a>';
+								echo '</li>';
 							}
 						?>
-							<li><a href="?new_paper=" class="action documents" title="Create an empty document">[+] New...</a></li>
+							<li><hr/></li>
+							<li>
+								<a href="?new_paper=" class="action documents" title="Create an empty document"><b>+</b> New...</a>
+								<a href="#" class="action documents delete" title="Delete current document"><b>&times;</b> Delete</a>
+							</li>
 						</ul>
 					</div>
 					<?php
@@ -294,7 +311,7 @@
 				echo '<fieldset class="half" id="fAuthors"><legend>Authors</legend>';
 					$authors = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
 					while ($author = db_fetch($authors)) {
-						echo '<div id="'.$author['id'].'">';
+						echo '<div id="o_'.$author['id'].'">';
 							echo '<img src="/i/drag.png" class="drag" />';
 							echo '<img src="/i/delete.png" class="btn delete'.($author['disp_order']>1?'':' hidden').'" />';
 							printHiddenInput('author[]', $author['id']);

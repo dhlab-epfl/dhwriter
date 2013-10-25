@@ -5,6 +5,11 @@ body {
   margin: 0 auto;
 }
 
+#metas form fieldset {
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+}
+
 .document_title {
   color: #000;
   font-size: 28px;
@@ -223,4 +228,8 @@ fieldset {
 legend {
   color: #96262b;
   font-weight: bold;
+}
+
+figcaption {
+  text-align: center;
 }

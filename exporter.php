@@ -37,12 +37,20 @@
 		}
 		$clearHeader.= '</ul><fieldset><legend>Summary</legend>'.$paper['abstract'].'</fieldset>';
 
+		// Move references contents to the end of the document
 		$body = preg_replace('/<(br|hr|img)([^>]*)>/', '<\1\2/>', $paper['text']).'</section><section id="references"><h2>References</h2><ol>';
 		$i=0;
 		$count = 1;
 		while ($count > 0) {
 			$i++;
 			$body = preg_replace('/<cite([^>]+)><span>([^\[][^<]*)<\/span><\/cite>(.*)/si', '<cite>['.$i.']</cite>$3<li>$2</li>', $body, 1, &$count);
+		}
+		// Manual numbering of the figures (CSS rules not supported here)
+		$i=0;
+		$count = 1;
+		while ($count > 0) {
+			$i++;
+			$body = preg_replace('/<figcaption>([^<]*)<\/figcaption>/si', '<figcaption class="nonum">Fig. '.$i.': \1</figcaption>', $body, 1, &$count);
 		}
 		$body.= '</ol>';
 		$pageBody = '<body><section id="header">'.$clearHeader.'</section><section id="article">'.$body.'</section></body>';

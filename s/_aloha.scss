@@ -10,8 +10,8 @@ body {
 #canvas {
 	counter-reset:figure citCount;
 	figure {
-		counter-increment:figCounter;
-		figcaption::before { content: "Fig. " counter(figCounter) " "; }
+		counter-increment:figure;
+		figcaption::before { content: "Fig. " counter(figure) " "; }
 	}
 }
 
