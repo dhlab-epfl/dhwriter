@@ -105,7 +105,7 @@
 		</text>
 	</xsl:template>
 
-	<xsl:template match="h1|h2|h3">
+	<xsl:template match="h1|h2|h3|h4">
 <!--	<head><xsl:apply-templates/></head>-->
 		<p rend="head"><xsl:apply-templates/></p>
 	</xsl:template>

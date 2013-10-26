@@ -414,6 +414,7 @@ define([
 			});
 			dialog.on('click', '.btn.zotero-delete', function(evt) {
 				var rawText = $el.text();
+				$.get('_.php', {'f':'deleteCitation', 'label':rawText});
 				$el.replaceWith('');
 				that.reloadCitations(that);
 			});

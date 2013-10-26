@@ -83,7 +83,20 @@ function execute($f) {
 			include('_db/_db.php');
 			session_start();
 			if (@$_SESSION['user_id']>0) {
-				db_i('citations', array('label' => $_REQUEST['label']));
+				$ref = db_fetch(db_s('citations', array('label' => $_REQUEST['label'])));
+				if ($ref===false) {
+					db_i('citations', array('label' => $_REQUEST['label'], 'used' => '1'));
+				}
+				else {
+					db_u('citations', array('label' => $_REQUEST['label']), array('used' => $ref['used']+1));
+				}
+			}
+			break;
+		case 'deleteCitation':
+			include('_db/_db.php');
+			session_start();
+			if (@$_SESSION['user_id']>0) {
+				db_d('citations', array('label' => $_REQUEST['label']));
 			}
 			break;
 		default:break;

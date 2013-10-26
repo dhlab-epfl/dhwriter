@@ -312,7 +312,6 @@
 		switch ($_REQUEST['ext']) {
 			case 'tei':
 				header('Content-Type: application/tei+xml');
-				header('Content-Type: text/plain');
 				$source = str_replace('><', ">\n<", str_replace('&nbsp;', ' ', html($paper, $authors, true)));
 				echo xslt($source, 'data/tei.xsl');
 				break;
