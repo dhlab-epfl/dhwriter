@@ -40,6 +40,9 @@ Aloha.ready(function(){
 				$.get('_.php?'+$('#fAuthors').sortable('serialize'), {'f':'sort', 't':'authors'});
 			}});
 		}
+		function htmlEscape(str) {			// http://stackoverflow.com/questions/1219860/html-encoding-in-javascript-jquery
+			return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
 /*					agree: "required"*/
 /*					agree: "Please accept our policy"*/
 		// ______________________________________________________________________________________________
@@ -75,8 +78,9 @@ Aloha.ready(function(){
 		$('aside a.export').bind('click touchdown', function(e){
 			e.preventDefault();
 			var url = 'exporter.php?ext='+$(this).data('ext')+'&rev='+$(this).data('rev');
-			var form = $('<form action="'+url+'" method="post">'+'<textarea name="src" >'+Aloha.getEditableById('canvas').getContents()+'</textarea></form>');
+			var form = $('<form action="'+url+'" method="post">'+'<input type="hidden" name="src" value="'+htmlEscape(Aloha.getEditableById('canvas').getContents())+'" /></form>');
 			form.append($('#metas form>*').clone());
+			console.log(form);
 			form.submit();
 		});
 		// ______________________________________________________________________________________________
@@ -235,7 +239,10 @@ function initSignupForm() {
 
 $(window).ready(function(){
 	$('#metas>header, #container>footer>div>h2').bind('click touchdown', function(){
-		$(this).closest('div').toggleClass('details', 200);
+		var refsDiv = $(this).closest('div');
+		refsDiv.toggleClass('details', 200, function(){
+			$('#canvas').css({'padding-bottom':refsDiv.height()+50});
+		});
 	});
 	$('.action.documents.delete').bind('click touchdown', function(e){
 		e.preventDefault();
