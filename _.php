@@ -96,7 +96,9 @@ function execute($f) {
 			include('_db/_db.php');
 			session_start();
 			if (@$_SESSION['user_id']>0) {
-				db_d('citations', array('label' => $_REQUEST['label']));
+				$ref = db_fetch(db_s('citations', array('label' => $_REQUEST['label'])));
+				db_u('citations', array('label' => $_REQUEST['label']), array('used' => $ref['used']-1));
+				db_d('citations', array('label' => $_REQUEST['label'], 'used' => '0'));
 			}
 			break;
 		default:break;

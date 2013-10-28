@@ -24,7 +24,7 @@
 		$authors = array();
 		$pageHeader.= '<head>';
 			$pageHeader.= '<title>'.$paper['title'].'</title>';
-			$pageHeader.= '<link rel="stylesheet" type="text/css" href="http://dhwriter.org/s/papers.css"></link>';
+			$pageHeader.= '<link rel="stylesheet" type="text/css" href="'.$_SERVER['SERVER_NAME'].'/s/papers.css"></link>';
 			$pageHeader.= '<meta name="description" content="'.$paper['abstract'].'" />';
 			foreach ($authors_r as $author) {
 				$authors[] = array($author['last_name'].','.$author['first_name'], $author['affiliation'], $author['email']);
