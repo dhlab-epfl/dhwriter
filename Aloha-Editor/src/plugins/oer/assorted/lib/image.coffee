@@ -259,6 +259,9 @@ define [
 
         deferred.resolve({target: $el[0], files: $uploadImage[0].files})
 
+      dialog.on 'shown', () =>
+        dialog.find('input,textarea,select').filter(':visible').first().focus()
+        
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
         $el.parents('.semantic-container').remove() unless editing
@@ -450,12 +453,12 @@ define [
   setThankYou = (wrapper) ->
     editDiv = wrapper.children('.image-edit')
     editDiv.html('<i class="icon-edit"></i> Thank You!').removeClass('passive')
-    editDiv.css('background', 'lightgreen')
-    editDiv.animate({backgroundColor: 'white', opacity: 0}, 2000, 'swing', -> setEditText wrapper)
+    editDiv.addClass('thank-you')
+    editDiv.animate({opacity: 0}, 2000, 'swing', -> setEditText wrapper)
 
   setEditText = (wrapper) ->
     alt = wrapper.children('img').attr('alt')
-    editDiv = wrapper.children('.image-edit').css('opacity', 1)
+    editDiv = wrapper.children('.image-edit').removeClass('thank-you').css('opacity', 1)
     if alt
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else

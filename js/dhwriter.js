@@ -3,10 +3,14 @@ var kAutoSaveDelay = 30000;		// in ms
 Aloha.ready(function(){
 	Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'], function(PubSub, GenericButton) {
 		var metasModified = false;
+		function getRawWords(htmlOrTextString) {
+			return htmlOrTextString.replace(/<([^>]*)>/mgi, ' ').replace(/\s/mg, ' ').replace(/\s+/g, ' ').trim();
+		}
 		function updateWordStats() {
-			var text = Aloha.getEditableById('canvas').getContents();
-			var w = text.trim().replace(/<([^>]*)>/gi, ' ').replace(/\s+/gi, ' ').split(' ').length;
-			var citationsLength = $('#canvas cite>span').text().trim().replace(/<([^>]*)>/gi, ' ').replace(/\s+/gi, ' ').split(' ').length;
+			var text = getRawWords($('<div />').html(Aloha.getEditableById('canvas').getContents()).text());
+			var w = text.split(' ').length;
+			var citationsText = getRawWords($('#canvas cite>span').text());
+			var citationsLength = citationsText.split(' ').length;
 			$('#wordsCount').html(w - citationsLength);
 			$('#wordsLimit').html('5000');
 		}

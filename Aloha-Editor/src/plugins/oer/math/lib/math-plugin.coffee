@@ -37,7 +37,7 @@
 #    </span>
 
 
-define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css' ], (Aloha, Plugin, jQuery, Popover, UI) ->
+define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'copy/copy-plugin', 'css!../../../oer/math/css/math.css' ], (Aloha, Plugin, jQuery, Popover, UI, Copy) ->
 
   EDITOR_HTML = '''
     <div class="math-editor-dialog">
@@ -61,6 +61,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
               <input type="radio" name="mime-type" value="text/plain"> Plain text
           </label>
           <button class="btn btn-primary done">Done</button>
+          <button class="btn copy">Copy</button>
         </div>
     </div>
   '''
@@ -138,6 +139,55 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     if editable.obj.is(':not(.aloha-root-editable)')
       return
 
+    # Bind copy and paste handlers. When a user copies content with math, place
+    # it on the clipboard with a different content type. This will prevent the
+    # cleanup that the browser does on namespaces. Use this alternative content
+    # type again when pasting. Prevent the browser default. This will only work
+    # in browsers that support event.clipboardData, chrome and safari to date.
+    editable.obj.on 'copy', (e) ->
+      content = e.oerContent or Aloha.getSelection().getRangeAt(0).cloneContents()
+      $content = $('<div />').append(content)
+      # If there is math among the content we're copying, treat it specially.
+      # Check that we also have a script tag in our selection, that occurs
+      # towards the end of the math and ensures we have the whole of it.
+      # The idea is to only do custom copy/paste if we need it, and let the
+      # browser handle other content. Also buffer it in our local copy buffer.
+      if $content.has('span.math-element').length and $content.has('script').length
+        e.preventDefault()
+        clipboard = e.clipboardData or e.originalEvent.clipboardData
+        clipboard.setData 'text/oerpub-content', $content.html()
+      else
+        Copy.buffer $content.html()
+
+    editable.obj.on 'paste', (e) ->
+      clipboard = e.clipboardData or e.originalEvent.clipboardData
+      content = clipboard.getData('text/oerpub-content')
+      if content
+        e.preventDefault()
+        $content = jQuery(
+          '<div class="aloha-ephemera-wrapper newly-pasted-content" />')
+          .append(content).hide()
+
+        # Remove ids, new ones will be assigned
+        $content.find('*[id]').removeAttr('id')
+
+        # Paste content into editor
+        range = Aloha.getSelection().getRangeAt(0)
+        range.insertNode($content.get(0))
+
+        # Re-typeset math, because we need our context menu back
+        math = []
+        $content.find('.math-element').each (idx, el) ->
+          deferred = $.Deferred()
+          math.push(deferred)
+          triggerMathJax jQuery(el), () -> deferred.resolve()
+
+        # When we're done typesetting, show the content and unwrap it.
+        $.when.apply($content, math).done ->
+          $content.each () ->
+            $$$ = jQuery(@)
+            $$$.replaceWith $$$.contents()
+
     # Bind ctrl+m to math insert/mathify
     editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
       insertMath()
@@ -145,7 +195,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
 
     # STEP1
     $maths = editable.obj.find('math')
-    $maths.wrap '<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>'
+    $maths.wrap '<span class="math-element aloha-ephemera-wrapper" contenteditable="false"><span class="mathjax-wrapper aloha-ephemera"></span></span>'
 
     # TODO: Explicitly call Mathjax Typeset
     jQuery.each $maths, (i, mml) ->
@@ -280,6 +330,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     $editor.find('.remove').on 'click', =>
       $span.trigger 'hide-popover'
       cleanupFormula($editor, $span, true)
+    $editor.find('.copy').on 'click', =>
+      Copy.buffer $span.outerHtml(), 'text/oerpub-content'
 
     $formula = $editor.find('.formula')
 
@@ -386,6 +438,11 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     $closer = $el.find '.math-element-destroy'
     if not $closer[0]?
       $closer = jQuery('<span class="math-element-destroy aloha-ephemera" title="Delete\u00A0math">&nbsp;</span>')
+      # The hidden event on the closeIcon should not propagate, otherwise it
+      # triggers cleanupFormula repeatedly on an empty math element, causing
+      # infinite recursion.
+      $closer.on 'hidden', (e) -> e.stopPropagation()
+
       if jQuery.ui and jQuery.ui.tooltip
         $closer.tooltip()
       else
@@ -458,6 +515,13 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
   # Register the button with an action
   UI.adopt 'insertMath', null,
     click: () -> insertMath()
+
+  # Add a copy option to the mathjax menu
+  MathJax.Callback.Queue MathJax.Hub.Register.StartupHook "MathMenu Ready", () ->
+    copyCommand = MathJax.Menu.ITEM.COMMAND "Copy Math", (e,f,g) ->
+      $script = jQuery(document.getElementById(MathJax.Menu.jax.inputID))
+      Copy.buffer $script.parent().parent().outerHtml(), 'text/oerpub-content'
+    MathJax.Menu.menu.items.unshift copyCommand
 
   ob =
     selector: '.math-element'

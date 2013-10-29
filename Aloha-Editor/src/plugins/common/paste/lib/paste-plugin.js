@@ -198,7 +198,7 @@ define([
 
 	/**
 	 * Prepare the nodes around where pasted content is to land.
-	 *
+	 * 
 	 * @param {WrappedRange} range
 	 */
 	function prepRangeForPaste(range) {

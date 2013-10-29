@@ -56,6 +56,7 @@
 	}
 	elseif (isset($_REQUEST['delete_paper'])) {
 		db_d('papers', array('id' => $_REQUEST['delete_paper'], 'user_id' => $_SESSION['user_id']));
+		db_d('authors', array('paper_id' => $_REQUEST['delete_paper'], 'user_id' => $_SESSION['user_id']));
 		$lastPaper = db_fetch(db_s('papers', array('user_id' => $_SESSION['user_id']), array('date_updated' => 'DESC')));
 		redirectAndDie('/?id='.$lastPaper['id']);
 	}
@@ -359,6 +360,17 @@
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.html" data-ext="html" data-rev="0" class="export"><img src="/i/export.png" />HTML</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="0" class="export"><img src="/i/export.png" />PDF</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="1" id="exportReview"><img src="/i/export.png" />Review PDF</a>
+<?php
+	$vs = db_s('papers', array('id' => (int)$_REQUEST['id'], 'user_id' => $user_id), array('version' => 'DESC'));
+	if (db_count($vs)>0) {
+		echo '<h2>Review Versions</h2>';
+		echo '<select name="v" style="width:140px; font-size:11px; height:22px;" onchange="this.selectedIndex=0;" title="Every time a review PDF is generated, a copy is kept here for further records. Choose a version to display it.">';
+		while ($v = db_fetch($vs)) {
+			echo '<option value="'.$v['version'].'">'.$v['version'].' ('.datetime('Y-m-d H:i', $v['date_updated']).')</option>';
+		}
+		echo '</select>';
+	}
+?>
 	<h2>Bug report</h2>
 	<a href="mailto:support@dhwriter.org?subject=DHwriter%20bug%20report" class="bugreport"><img src="/i/mail.png" />Submit by e-mail</a>
 	<a href="https://github.com/cyrilbornet/dhwriter/issues" class="github"><img src="/i/github.png" />Github</a>
