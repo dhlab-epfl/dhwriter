@@ -1,4 +1,5 @@
-var kAutoSaveDelay = 30000;		// in ms
+var kAutoSaveDelay = 30000;				// in ms
+var kKeepAliveInterval = 5*60*1000;		// in ms
 
 Aloha.ready(function(){
 	Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'], function(PubSub, GenericButton) {
@@ -86,6 +87,9 @@ Aloha.ready(function(){
 			form.append($('#metas form>*').clone());
 			console.log(form);
 			form.submit();
+		});
+		$('aside a.import').bind('click touchdown', function(e){
+			e.preventDefault();
 		});
 		// ______________________________________________________________________________________________
 		function savePreview(callback_function){
@@ -254,4 +258,12 @@ $(window).ready(function(){
 		window.location.href = '?delete_paper='+$('#metas>form input[name=paper_id]').val();
 	});
 	initSignupForm();
+	setInterval(function(){keepAlive();}, kKeepAliveInterval);
 });
+
+function keepAlive() {
+	$.get('index.php');
+}
+function showPaperVersion(user_id, id, version, modifDate) {
+	window.open('/paper/'+modifDate+'.'+user_id+'.'+id+'.'+version+'.html','paper'+modifDate,'toolbar=0,status=0,width=800,height=500')
+}

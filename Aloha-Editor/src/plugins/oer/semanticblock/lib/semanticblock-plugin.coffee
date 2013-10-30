@@ -1,7 +1,12 @@
-define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'copy/copy-plugin', 'css!semanticblock/css/semanticblock-plugin.css'], (Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button, Copy) ->
+define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'copy/copy-plugin', 'css!semanticblock/css/semanticblock-plugin.css'], (Aloha, Block, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button, Copy) ->
 
   # hack to accomodate multiple executions
   return pluginManager.plugins.semanticblock  if pluginManager.plugins.semanticblock
+
+  semanticBlock = Block.AbstractBlock.extend
+    shouldDestroy: -> false # this stops aloha from destroying our blocks all willy nilly
+
+  BlockManager.registerBlockType 'semanticBlock', semanticBlock
 
   DIALOG_HTML = '''
     <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
@@ -27,13 +32,13 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   blockTemplate = jQuery('<div class="semantic-container aloha-ephemera-wrapper"></div>')
   topControls = jQuery('''
     <div class="semantic-controls-top aloha-ephemera">
-      <a class="copy" title="Copy this element."><i class="icon-copy"></i> Copy element</button>
+      <a class="copy" title="Copy this element"><i class="icon-copy"></i> Copy element</button>
     </div>
   ''')
   blockControls = jQuery('''
     <div class="semantic-controls aloha-ephemera">
-      <button class="semantic-delete" title="Remove this element."><i class="icon-remove"></i></button>
-      <button class="semantic-settings" title="advanced options."><i class="icon-cog"></i></button>
+      <button class="semantic-delete" title="Remove this element"><i class="icon-remove"></i></button>
+      <button class="semantic-settings" title="Advanced options for this element"><i class="icon-cog"></i></button>
     </div>''')
   blockDragHelper = jQuery('''
     <div class="semantic-drag-helper aloha-ephemera">
@@ -46,13 +51,13 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'mouseenter'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container').addClass 'drag-active'
+      jQuery(this).parent('.semantic-container').addClass 'drag-active'
   ,
     name: 'mouseleave'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container')
-        .removeClass 'drag-active'  unless jQuery(this).parents('.semantic-container').is('.aloha-oer-dragging')
+      jQuery(this).parent('.semantic-container')
+        .removeClass 'drag-active'  unless jQuery(this).parent('.semantic-container').is('.aloha-oer-dragging')
   ,
     name: 'mouseenter'
     selector: '.semantic-delete'
@@ -86,7 +91,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     callback: (e) ->
       # grab the content of the block that was just clicked
       $element = jQuery(this).parents('.semantic-container').first()
-      Copy.buffer $element.outerHtml(), Copy.getCurrentPath()
+      Copy.buffer $element.outerHtml()
   ,
     name: 'mouseover'
     selector: '.semantic-container .semantic-controls-top .copy'
@@ -141,7 +146,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
       wrapped = jQuery(this).children('.aloha-oer-block').first()
       label = wrapped.length and blockIdentifier(wrapped)
-      jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{label} to another location.")
+      jQuery(this).find('.aloha-block-handle').first().attr('title', "Drag this #{label} to another location")
   ,
     name: 'mouseout'
     selector: '.semantic-container'
@@ -174,7 +179,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       # Show the classes involved, filter out the aloha ones
       classes = (c for c in $element.attr('class').split(/\s+/) when not /^aloha/.test(c))
       elementName = classes.length and "element (class='#{classes.join(' ')}')" or 'element'
-
+	
   activate = ($element) ->
     unless $element.is('.semantic-container') or ($element.is('.alternates') and $element.parents('figure').length)
       $element.addClass 'aloha-oer-block'
@@ -194,10 +199,12 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       controls = blockControls.clone()
       top = topControls.clone()
       label = blockIdentifier($element)
-      controls.find('.semantic-delete').attr('title', "Remove this #{label}.")
-      top.find('.copy').attr('title', "Copy #{label}.")
+      controls.find('.semantic-delete').attr('title', "Remove this #{label}")
+      controls.find('.semantic-settings').attr('title', "Advanced options for this #{label}")
+      top.find('.copy').attr('title', "Copy this #{label}")
+      top.find('.copy').contents().last().replaceWith(" Copy #{label}")
       if type == null
-        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock()
+        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock({'aloha-block-type': 'semanticBlock'})
       else
         # Ask `type` plugin about the controls it wants
         if type.options
@@ -212,7 +219,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
             controls.find('button.semantic-settings').remove() if 'settings' not in options.buttons
             top.find('a.copy').remove() if 'copy' not in options.buttons
 
-        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock()
+        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock({'aloha-block-type': 'semanticBlock'})
         type.activate $element
         return
  
@@ -347,7 +354,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
             elementLabel = (element.data('type') or element.attr('class')).split(' ')[0]
             element.draggable
               connectToSortable: $root
-              appendTo: jQuery('body')
+              appendTo: jQuery('#content')
               revert: 'invalid'
               helper: ->
                 helper = jQuery(blockDragHelper).clone()

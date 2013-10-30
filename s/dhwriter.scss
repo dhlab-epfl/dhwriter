@@ -229,6 +229,7 @@ body {
 		span { display:inline; line-height:100%; }
 		#counters { letter-spacing:-1px; }
 		#wordsCount { font-weight:bold; letter-spacing:0; }
+		#boxImport { display:none; }
 	}
 
 	.ui-widget-content {
@@ -279,4 +280,11 @@ body {
 
 #zotero-title {
 	width:100%;
+}
+
+#browserError {
+	width:400px; height:200px; margin:100px auto; background:#fff; border:1px solid #c00; padding:20px;
+	>* { margin:5px; }
+	h1, h2 { text-align:center; font:{weight:bold; size:18px;}; margin-bottom:15px; }
+	h2 { font-size:16px; }
 }

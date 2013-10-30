@@ -77,6 +77,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" type="text/css" href="/s/dhwriter.css"></link>
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+	<script type="text/javascript" src="/js/upload.min.js"></script>
 	<script type="text/javascript" src="/js/aloha-oerpub.min.js"></script>
 	<!-- Mathjax -->
 	<script type="text/javascript" src="/MathJax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
@@ -283,6 +284,17 @@
 			</div><!-- / ".toolbar" -->
 		</metal:toolbar>
 <?php
+		if (preg_match("/MSIE/", $_SERVER['HTTP_USER_AGENT'])) {
+			echo '<div id="browserError">';
+				echo '<h1>Sorry</h1>';
+				echo '<h2>Your web browser is not compatible with DHwriter.</h2>';
+				echo '<br/>';
+				echo '<p>Alternately you can try one of the following browsers:<ul><li>Google Chrome</li><li>Safari</li></ul></p>';
+				echo '<p>Thank you for your understanding.</p>';
+			echo '</div>';
+			die();
+		}
+
 		$user_id = isset($_SESSION['user_id'])?$_SESSION['user_id']:'1';
 		$paper = db_fetch(db_s('papers', array('id' => (int)$_REQUEST['id'], 'user_id' => $user_id), array('version' => 'DESC')));
 		if ($paper==null) {
@@ -355,18 +367,28 @@
 <aside><header>Tools</header>
 	<h2>Statistics</h2>
 	<p id="counters">Words: <span id="wordsCount"></span> / <span id="wordsLimit"></span></p>
+<?php
+	if (sessionAllows(array('admin'))) {
+		echo '<h2>Import</h2>';
+		echo '<a href="#" data-ext="tei" class="import"><img src="/i/import.png" />TEI</a>';
+		echo '<div id="boxImport">';
+			printUploadInput('', 'upload');
+		echo '</div>';
+	}
+?>
 	<h2>Export</h2>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.tei" data-ext="tei" data-rev="0" class="export"><img src="/i/export.png" />TEI</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.html" data-ext="html" data-rev="0" class="export"><img src="/i/export.png" />HTML</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="0" class="export"><img src="/i/export.png" />PDF</a>
 	<a href="/export/<?php echo (int)$_REQUEST['id'] ?>.pdf" data-ext="pdf" data-rev="1" id="exportReview"><img src="/i/export.png" />Review PDF</a>
 <?php
-	$vs = db_s('papers', array('id' => (int)$_REQUEST['id'], 'user_id' => $user_id), array('version' => 'DESC'));
+	$vs = db_s('papers', array('id' => (int)$_REQUEST['id'], 'user_id' => @$_SESSION['user_id']), array('version' => 'DESC'));
 	if (db_count($vs)>0) {
 		echo '<h2>Review Versions</h2>';
-		echo '<select name="v" style="width:140px; font-size:11px; height:22px;" onchange="this.selectedIndex=0;" title="Every time a review PDF is generated, a copy is kept here for further records. Choose a version to display it.">';
+		echo '<select name="v" style="width:140px; font-size:11px; height:22px;" onclick="var v=this.value.split(\',\');if(v.length==2){showPaperVersion('.$_SESSION['user_id'].','.$_REQUEST['id'].',v[0],v[1]);}this.selectedIndex=0;" title="Every time a review PDF is generated, a copy is kept here for further records. Choose a version to display it.">';
+		echo '<option>Select to show...</option>';
 		while ($v = db_fetch($vs)) {
-			echo '<option value="'.$v['version'].'">'.$v['version'].' ('.datetime('Y-m-d H:i', $v['date_updated']).')</option>';
+			echo '<option value="'.$v['version'].','.datetime('U', $v['date_updated']).'">'.$v['version'].' ('.datetime('Y-m-d H:i', $v['date_updated']).')</option>';
 		}
 		echo '</select>';
 	}
