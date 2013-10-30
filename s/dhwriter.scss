@@ -211,7 +211,7 @@ body {
 		box-shadow: none !important;
 	}
 
-	>aside {
+	>aside#tools {
 		position:fixed; top:50px; bottom:0; left:10px; width:$kSidebar_W; background:#eee; padding:6px;
 		>header {
 			font:{size:11px; weight:bold; } text-align:center; margin-bottom:10px; padding-bottom:6px;
@@ -229,7 +229,12 @@ body {
 		span { display:inline; line-height:100%; }
 		#counters { letter-spacing:-1px; }
 		#wordsCount { font-weight:bold; letter-spacing:0; }
-		#boxImport { display:none; }
+		.importRow { position:relative; }
+		#boxImport {
+			position:absolute; left:160px; margin-top:-30px; background:#f3f3f3; width:400px; height:50px; border-radius:7px; padding:10px; box-shadow:1px 1px 5px rgba(0,0,0,0.3);
+			display:none;
+			&:before { @include fullTriangle(15px, left, #f3f3f3); top:10px; }
+		}
 	}
 
 	.ui-widget-content {
@@ -270,21 +275,40 @@ body {
 }
 
 #loginFull {
-	position:fixed; z-index:$kZ_wait; top:0; right:0; bottom:0; left:0; background:#fff; @include ALPHA(97);
+	@include FIXED_FULL; z-index:$kZ_wait; background:#fff; @include ALPHA(97);
 	display:none;
 	form { margin:auto; }
 	#fLogin {}
 	#fReg { display:none; }
-	.close { position:absolute; top:20px; right:20px; cursor:pointer; @include ALPHA(100); }
 }
 
 #zotero-title {
 	width:100%;
 }
 
+@mixin panel {
+	@include ABSOLUTE_CENTERED_X(400px);
+	background:#fff; padding:20px; box-shadow:2px 2px 15px rgba(0,0,0,0.3);
+	z-index:$kZ_wait - 10;
+}
+
 #browserError {
-	width:400px; height:200px; margin:100px auto; background:#fff; border:1px solid #c00; padding:20px;
+	@include panel; border:1px solid #c00;
+	@include ABSOLUTE_CENTERED_Y(250px);
+	position:fixed;
 	>* { margin:5px; }
 	h1, h2 { text-align:center; font:{weight:bold; size:18px;}; margin-bottom:15px; }
 	h2 { font-size:16px; }
 }
+
+#wAccount {
+	@include FIXED_FULL;
+	z-index:$kZ_wait - 11;
+	display:none;
+	background:rgba(0,0,0,0.7);
+	>form {
+		@include panel; top:20%; position:fixed; border:1px solid #999;
+	}
+}
+
+img.close { position:absolute; top:20px; right:20px; cursor:pointer; @include ALPHA(100); }

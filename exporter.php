@@ -266,9 +266,14 @@
 */
 	}
 
-	function pdf($paper, $authors, $reviewMode=false) {
+	function pdf($paper, $authors, $reviewMode=false, $fileName='dhwriter_export') {
 		$pdf = new mPDF();
 		$pdf->AliasNbPages();
+		$pdf->ignore_invalid_utf8 = true;
+		$pdf->PDFAauto=true;
+		$pdf->setTitle($paper['title']);
+		$pdf->setAuthor($authors[0]['first_name'].' '.$authors[0]['last_name']);
+		$pdf->setCreator('DHWriter/'.date('Y-m-d', getlastmod()));
 		if ($reviewMode) {
 			// Première page
 			$pdf->AddPage();
@@ -303,7 +308,7 @@
 		$stylesheet = file_get_contents('s/pdf.css');
 		$pdf->WriteHTML($stylesheet,1);	// The parameter 1 tells that this is css/style only and no body/html/text
 		$pdf->WriteHTML(html($paper, $authors, false));
-		$pdf->Output();
+		$pdf->Output($fileName.'.pdf', 'I');
 		exit;
 	}
 
@@ -325,7 +330,7 @@
 					$paper['version'] = $paper['version']+1;
 					db_i('papers', $paper);
 				}
-				echo pdf($paper, $authors, $reviewMode);
+				echo pdf($paper, $authors, $reviewMode, $fileName);
 				break;
 			default:
 				break;

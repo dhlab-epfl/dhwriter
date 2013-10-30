@@ -4,6 +4,7 @@
 	include_once('_formutils.php');
 	include_once('_structure.php');
 
+
 	if (isset($_REQUEST['signup'])) {		#&&@$_REQUEST['captcha']==''
 		$datas = array(	'email' => $_REQUEST['email'],
 						'username' => $_REQUEST['email'],
@@ -68,6 +69,18 @@
 			$_REQUEST['id'] = 1;
 		}
 		redirectAndDie('/?id='.$_REQUEST['id']);
+	}
+	elseif (isset($_REQUEST['save_account'])) {
+		$datas = array(	'email' => $_REQUEST['email'],
+						'username' => $_REQUEST['email'],
+						'first_name' => $_REQUEST['first_name'],
+						'last_name' => $_REQUEST['last_name'],
+						'institution' => $_REQUEST['institution'],
+						);
+		if (@$_REQUEST['password3']!='' && $_REQUEST['password3']==$_REQUEST['password4']) {
+			$datas['password'] = md5(PWD_SALT.md5(trim($_REQUEST['password3'])));
+		}
+		db_u('users', array('id' => $_SESSION['user_id']), $datas);
 	}
 ?>
 <!DOCTYPE html>
@@ -364,15 +377,17 @@
 	</footer>
 </div>
 </div>
-<aside><header>Tools</header>
+<aside id="tools"><header>Tools</header>
 	<h2>Statistics</h2>
 	<p id="counters">Words: <span id="wordsCount"></span> / <span id="wordsLimit"></span></p>
 <?php
 	if (sessionAllows(array('admin'))) {
 		echo '<h2>Import</h2>';
-		echo '<a href="#" data-ext="tei" class="import"><img src="/i/import.png" />TEI</a>';
-		echo '<div id="boxImport">';
-			printUploadInput('', 'upload');
+		echo '<div class="importRow">';
+			echo '<a href="#" data-ext="tei" class="import"><img src="/i/import.png" />TEI</a>';
+			echo '<div id="boxImport">';
+				printUploadInput('', 'upload');
+			echo '</div>';
 		echo '</div>';
 	}
 ?>
@@ -396,6 +411,26 @@
 	<h2>Bug report</h2>
 	<a href="mailto:support@dhwriter.org?subject=DHwriter%20bug%20report" class="bugreport"><img src="/i/mail.png" />Submit by e-mail</a>
 	<a href="https://github.com/cyrilbornet/dhwriter/issues" class="github"><img src="/i/github.png" />Github</a>
+</aside>
+<aside id="wAccount">
+<?php
+	if ($user = db_fetch(db_s('users', array('id' => $_SESSION['user_id'])))) {
+		echo '<form id="accountForm" action="'.$_SERVER['PHP_SELF'].'?id='.$_REQUEST['id'].'" method="post">';
+			printHiddenInput('save_account', $_SESSION['user_id']);
+			echo '<img src="/i/close.png" alt="Close" class="close" />';
+			echo '<label for="email">e-Mail</label><input type="text" name="email" id="email" value="'.$user['email'].'" /><br/>';
+			echo '<label for="first_name">First Name</label><input type="text" name="first_name" id="first_name" value="'.$user['first_name'].'" /><br/>';
+			echo '<label for="last_name">Last Name</label><input type="text" name="last_name" id="last_name" value="'.$user['last_name'].'" /><br/>';
+			echo '<label for="institution">Institute</label><input type="text" name="institution" id="institution" value="'.$user['institution'].'" /><br/>';
+			echo '<br/>';
+			echo '<br/>';
+			echo '<label for="password3">New Password</label><input type="password" name="password3" id="password3" /><br/>';
+			echo '<label for="password4">Confirm</label><input type="password" name="password4" id="password4" /><br/>';
+			echo '<br/>';
+			echo '<label></label><input class="submit" type="submit" name="save_account" value="Submit" />';
+		echo '</form>';
+	}
+?>
 </aside>
 <div id="wait"><img src="/i/loading.gif" alt="…" /></div>
 <script src="/js/retina.min.js"></script>

@@ -207,7 +207,7 @@ Aloha.ready(function(){
 	});
 });
 
-function initSignupForm() {
+function initFormsValidator() {
 	$('#signupForm').validate({
 		rules: {
 			first_name: 'required',
@@ -243,6 +243,40 @@ function initSignupForm() {
 			}
 		}
 	});
+	$('#accountForm').validate({
+		rules: {
+			first_name: 'required',
+			last_name: 'required',
+			institution: 'required',
+			email: {
+				required: true,
+				email: true
+			},
+			password3: {
+				minlength: 5
+			},
+			password4: {
+				minlength: 5,
+				equalTo: '#password3'
+			}
+		},
+		messages: {
+			firstname: 'Please fill in your first name',
+			lastname: 'Please fill in your last name',
+			institution: 'Please fill in your institution',
+			email: 'Please enter a valid email address',
+			password3: {
+				required: 'Please provide a password',
+				minlength: 'Your password must be at least 5 characters long'
+			},
+			password4: {
+				required: 'Please provide a password',
+				minlength: 'Your password must be at least 5 characters long',
+				equalTo: 'Please enter the same password as above'
+			}
+		}
+	}
+	);
 }
 
 $(window).ready(function(){
@@ -257,7 +291,9 @@ $(window).ready(function(){
 		e.stopPropagation();
 		window.location.href = '?delete_paper='+$('#metas>form input[name=paper_id]').val();
 	});
-	initSignupForm();
+	$('.action.my-account').bind('click touchdown', function(e){ showAccount(); });
+	$('#wAccount .close').bind('click touchdown', function(e){ hideAccount(); });
+	initFormsValidator();
 	setInterval(function(){keepAlive();}, kKeepAliveInterval);
 });
 
@@ -266,4 +302,10 @@ function keepAlive() {
 }
 function showPaperVersion(user_id, id, version, modifDate) {
 	window.open('/paper/'+modifDate+'.'+user_id+'.'+id+'.'+version+'.html','paper'+modifDate,'toolbar=0,status=0,width=800,height=500')
+}
+function showAccount() {
+	$('#wAccount').fadeIn();
+}
+function hideAccount() {
+	$('#wAccount').fadeOut();
 }
