@@ -75,7 +75,7 @@ function db_w($refs) {
 				$where[] = 'LOWER('.$proper_key.') LIKE '.$str_val;
 			}elseif(strstr($key, "!")){
 				$proper_key = str_replace('!','',$key);
-				$str_val = ($value===null)?'null':'"'.db_escape($proper_key, $link).'"';
+				$str_val = ($value===null)?'null':'"'.db_escape($value, $link).'"';
 				$where[] = $proper_key.' != '.$str_val;
 			}else{
 				$str_val = ($value===null)?'null':'"'.db_escape($value, $link).'"';
