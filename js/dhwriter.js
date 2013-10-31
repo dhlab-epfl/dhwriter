@@ -83,10 +83,10 @@ Aloha.ready(function(){
 		$('aside a.export').bind('click touchdown', function(e){
 			e.preventDefault();
 			var url = 'exporter.php?ext='+$(this).data('ext')+'&rev='+$(this).data('rev');
-			var form = $('<form action="'+url+'" method="post">'+'<input type="hidden" name="src" value="'+htmlEscape(Aloha.getEditableById('canvas').getContents())+'" /></form>');
-			form.append($('#metas form>*').clone());
-			console.log(form);
+			var form = $('<form action="'+url+'" method="post" style="display:none;">'+'<input type="hidden" name="src" value="'+htmlEscape(Aloha.getEditableById('canvas').getContents())+'" /><input type="submit" name="export" value=""/></form>');
+			form.append($('#metas form>*').clone()).appendTo($('body'));		// http://stackoverflow.com/questions/5208224/firefox-wont-submit-a-form-created-by-javascript
 			form.submit();
+			form.remove();
 		});
 		$('aside a.import').bind('click touchdown', function(e){
 			e.preventDefault();
