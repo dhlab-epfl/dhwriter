@@ -78,8 +78,6 @@
 		function PDF($orientation='P', $unit='mm', $size='A4') {
 #			$this->AddFont('DejaVuSans','','DejaVuSans.ttf', true);
 			$this->mPDF($orientation,$size); 								// Appel au constructeur parent
-			$this->useAdobeCJK = true;
-			$this->SetAutoFont(AUTOFONT_ALL);
 			$this->SetLeftMargin($this->leftMargin);
 			$this->SetRightMargin($this->topMargin);
 			$this->styleStack = array($this->defaultStyle);
@@ -267,11 +265,12 @@
 	}
 
 	function pdf($paper, $authors, $reviewMode=false, $fileName='dhwriter_export') {
-		$pdf = new mPDF();
+		$pdf = new mPDF('-aCJK','A4');
 		$pdf->AliasNbPages();
 		$pdf->ignore_invalid_utf8 = true;
 		$pdf->PDFA = true;
 		$pdf->PDFAauto = true;
+		$pdf->SetAutoFont(AUTOFONT_ALL);
 		$pdf->setTitle($paper['title']);
 		$pdf->setAuthor($authors[0]['first_name'].' '.$authors[0]['last_name']);
 		$pdf->setCreator('DHWriter/'.date('Y-m-d', getlastmod()));

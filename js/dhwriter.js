@@ -39,9 +39,11 @@ Aloha.ready(function(){
 				$(this).find('.btn.delete').unbind('click touchdown').bind('click touchdown', function(){
 					$.get('_.php', {'f':'deleteAuthor', 'id':subForm.find('input[type="hidden"]').val()});
 					subForm.slideUp(function(){$(this).remove();});
+					metasModified = true;
 				});
 			});
 			$('#fAuthors').sortable({handle:'.drag', containment:'parent', scroll:true, update:function(e,ui){
+				metasModified = true;
 				$.get('_.php?'+$('#fAuthors').sortable('serialize'), {'f':'sort', 't':'authors'});
 			}});
 		}

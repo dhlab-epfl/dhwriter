@@ -20,7 +20,7 @@
 
 $GLOBALS['DBHost'] = 'localhost';
 $GLOBALS['DBUser'] = 'dhwriter';
-$GLOBALS['DBPass'] = 'gcd2386*';
+$GLOBALS['DBPass'] = '********';
 $GLOBALS['DBName'] = 'dhwriter';
 
 // === Ouvre une CONNEXION globale au serveur de DB ============================================================================================================

@@ -3,6 +3,7 @@
 @import "../Aloha-Editor/src/plugins/oer/math/css/math";
 
 // Local declarations (mpdf doesn't seem to support nested tags yet)
+body { font-family:cyberbit; }
 cite, q { display:inline; }
 #authors li { width:45%; float:left; }
 fieldset { border:$kBorder; padding:10px; }
