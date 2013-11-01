@@ -11,6 +11,7 @@
 				$html.= '<title>'.$paper['title'].'</title>';
 				$html.= '<base href="http://'.$_SERVER['SERVER_NAME'].'" />';
 				$html.= '<link rel="stylesheet" type="text/css" href="/s/papers.css"></link>';
+/*
 				$html.= '<script type="text/javascript" src="/MathJax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"></script>';
 				$html.= '<script type="text/x-mathjax-config">MathJax.Hub.Config({
 		jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
@@ -21,6 +22,7 @@
 			  },
 			  AsciiMath: { noErrors: { disabled: true } }
 			});</script>';
+*/
 				$html.= '<meta name="description" content="'.$paper['abstract'].'" />';
 				$a_r = db_s('authors', array('paper_id' => $paper['id']), array('disp_order' => 'ASC'));
 				while ($author = db_fetch($a_r)) {

@@ -13,7 +13,7 @@ Aloha.ready(function(){
 			var citationsText = getRawWords($('#canvas cite>span').text());
 			var citationsLength = citationsText.split(' ').length;
 			$('#wordsCount').html(w - citationsLength);
-			$('#wordsLimit').html('5000');
+			$('#wordsLimit').html('1500');
 		}
 		function paperWasModified() {
 			var editor = Aloha.getEditableById('canvas');
@@ -298,7 +298,7 @@ $(window).ready(function(){
 });
 
 function keepAlive() {
-	$.get('index.php');
+	$.get('index.php', function(data){ });
 }
 function showPaperVersion(user_id, id, version, modifDate) {
 	window.open('/paper/'+modifDate+'.'+user_id+'.'+id+'.'+version+'.html','paper'+modifDate,'toolbar=0,status=0,width=800,height=500')
